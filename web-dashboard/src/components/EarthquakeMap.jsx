@@ -22,25 +22,31 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
   const tileLayerRef = useRef(null);
   const markersRef = useRef({});
 
-  const [mapStyle, setMapStyle] = useState('VOYAGER'); // 'VOYAGER', 'DARK', 'TOPO'
+  const [mapStyle, setMapStyle] = useState('OSM'); // 'OSM', 'DARK', 'TOPO'
   const [activeLayer, setActiveLayer] = useState('ALL'); // 'ALL', 'M5', 'DIRASAKAN'
   const [magFilter, setMagFilter] = useState('ALL'); // 'ALL', 'M4', 'M5', 'M6'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedQuakeFocus, setSelectedQuakeFocus] = useState(null);
 
-  // Daftar layer basemap
+  // Daftar layer basemap (100% Bebas API Key & Tanpa Watermark)
   const TILE_CONFIGS = {
-    VOYAGER: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      attrib: '&copy; OpenStreetMap &copy; CARTO'
+    OSM: {
+      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attrib: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+      subdomains: 'abc'
     },
     DARK: {
-      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      attrib: '&copy; OpenStreetMap &copy; CARTO'
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      maxZoom: 16,
+      subdomains: ''
     },
     TOPO: {
       url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-      attrib: '&copy; OpenStreetMap &copy; OpenTopoMap'
+      attrib: '&copy; OpenStreetMap, SRTM | Map style: &copy; OpenTopoMap',
+      maxZoom: 17,
+      subdomains: 'abc'
     }
   };
 
@@ -57,10 +63,11 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
         scrollWheelZoom: false,
       });
 
-      const initialLayer = window.L.tileLayer(TILE_CONFIGS[mapStyle].url, {
-        attribution: TILE_CONFIGS[mapStyle].attrib,
-        subdomains: 'abcd',
-        maxZoom: 19
+      const initialCfg = TILE_CONFIGS[mapStyle];
+      const initialLayer = window.L.tileLayer(initialCfg.url, {
+        attribution: initialCfg.attrib,
+        subdomains: initialCfg.subdomains || 'abc',
+        maxZoom: initialCfg.maxZoom || 19
       }).addTo(map);
 
       tileLayerRef.current = initialLayer;
@@ -280,11 +287,11 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
           {/* Basemap Style Switcher (Terang / Gelap Radar / Topo) */}
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
             <button
-              onClick={() => { setMapStyle('VOYAGER'); playSound('click'); }}
+              onClick={() => { setMapStyle('OSM'); playSound('click'); }}
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
-                mapStyle === 'VOYAGER' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                mapStyle === 'OSM' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Peta Terang (Default)"
+              title="Tampilan Peta Terang (OpenStreetMap - Bebas API Key)"
             >
               <Sun className="w-3.5 h-3.5 text-amber-500" />
               <span className="hidden sm:inline">Terang</span>
@@ -294,7 +301,7 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
                 mapStyle === 'DARK' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Peta Radar Seismologi Malam / Gelap"
+              title="Tampilan Peta Radar Seismologi Malam / Gelap (Esri Dark Canvas)"
             >
               <Moon className="w-3.5 h-3.5 text-indigo-400" />
               <span className="hidden sm:inline">Radar</span>
@@ -304,7 +311,7 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
                 mapStyle === 'TOPO' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Peta Kontur &amp; Relief Topografi"
+              title="Peta Kontur &amp; Relief Topografi (OpenTopoMap)"
             >
               <Mountain className="w-3.5 h-3.5 text-emerald-600" />
               <span className="hidden sm:inline">Relief</span>
