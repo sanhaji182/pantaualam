@@ -1,0 +1,108 @@
+# =============================================================================
+# DOCKER COMPOSE: NUSANTARA WEATHER & DISASTER MONITOR
+# Orkestrasi Multi-Container (PostgreSQL, Python Ingestion, Golang Gateway, React Web)
+# Cara Menjalankan: docker compose up --build -d
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. DATABASE: POSTGRESQL 16 (Hybrid Relational + JSONB NoSQL)
+  # ---------------------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: nw_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: nusantara_weather
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      # Port 5432 dibuka untuk koneksi development dari host
+      - "5432:5432"
+    volumes:
+      # Volume untuk penyimpanan data permanen (data tidak hilang saat container restart)
+      - pgdata:/var/lib/postgresql/data
+      # Inisialisasi skema tabel dan seed data awal otomatis
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - nw_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nusantara_weather"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # 2. INGESTION SERVICE: PYTHON WORKER (Penarik Data BMKG)
+  # ---------------------------------------------------------------------------
+  ingestion:
+    build:
+      context: ../ingestion-service
+      dockerfile: Dockerfile
+    container_name: nw_ingestion
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      DB_NAME: nusantara_weather
+      SYNC_INTERVAL_SECONDS: 900 # Tarik data tiap 15 menit
+      HTTP_TIMEOUT: 15
+    networks:
+      - nw_network
+
+  # ---------------------------------------------------------------------------
+  # 3. CORE GATEWAY: GOLANG REST API (Port 8080)
+  # ---------------------------------------------------------------------------
+  gateway:
+    build:
+      context: ../core-gateway
+      dockerfile: Dockerfile
+    container_name: nw_gateway
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      DB_NAME: nusantara_weather
+      JWT_SECRET: kunci_rahasia_jwt_nusantara_weather_prod_secure_key
+    networks:
+      - nw_network
+
+  # ---------------------------------------------------------------------------
+  # 4. WEB DASHBOARD: REACT JS FRONTEND (Port 3000)
+  # ---------------------------------------------------------------------------
+  web:
+    build:
+      context: ../web-dashboard
+      dockerfile: Dockerfile
+    container_name: nw_web
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+    networks:
+      - nw_network
+
+# -----------------------------------------------------------------------------
+# JARINGAN & VOLUME DOCKER
+# -----------------------------------------------------------------------------
+networks:
+  nw_network:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local
