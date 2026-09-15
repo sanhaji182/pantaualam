@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { 
   Layers, Activity, MapPin, Eye, Radio, Info, Search, 
-  Filter, Moon, Sun, Mountain, Volume2, Sparkles, Navigation 
+  Filter, Moon, Sun, Mountain, Volume2, Sparkles, Navigation, Globe 
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
@@ -12,8 +12,8 @@ import { playSound } from '../utils/audio';
  * Deskripsi:
  * Menggabungkan visualisasi geospatial titik episentrum gempa bumi di peta
  * interaktif Leaflet dengan panel Feed Gempa Terbaru di sisi kanan.
- * Dilengkapi dengan 3 Mode Peta (Terang / Radar Gelap / Topografi), filter
- * magnitudo, pencarian nama wilayah, dan auto-flyTo kamera dengan popup aktif.
+ * Dilengkapi dengan 4 Mode Peta (Terang Voyager / Radar Gelap / Topografi Relief / Citra Satelit),
+ * filter magnitudo, pencarian wilayah, dan auto-flyTo kamera dengan popup aktif.
  * =============================================================================
  */
 export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuakes = [] }) {
@@ -22,31 +22,42 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
   const tileLayerRef = useRef(null);
   const markersRef = useRef({});
 
-  const [mapStyle, setMapStyle] = useState('OSM'); // 'OSM', 'DARK', 'TOPO'
+  const [mapStyle, setMapStyle] = useState('VOYAGER'); // 'VOYAGER', 'DARK', 'TOPO', 'SATELLITE'
   const [activeLayer, setActiveLayer] = useState('ALL'); // 'ALL', 'M5', 'DIRASAKAN'
   const [magFilter, setMagFilter] = useState('ALL'); // 'ALL', 'M4', 'M5', 'M6'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedQuakeFocus, setSelectedQuakeFocus] = useState(null);
 
-  // Daftar layer basemap (100% Bebas API Key & Tanpa Watermark)
+  // Ambil API key CARTO opsional dari environment (jika diset, watermark otomatis hilang)
+  const cartoApiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CARTO_API_KEY)
+    ? `?key=${import.meta.env.VITE_CARTO_API_KEY}`
+    : '';
+
+  // Konfigurasi basemap presisi dengan garis pantai dan batas wilayah yang rapi
   const TILE_CONFIGS = {
-    OSM: {
-      url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-      attrib: '&copy; OpenStreetMap contributors',
+    VOYAGER: {
+      url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${cartoApiKey}`,
+      attrib: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
       maxZoom: 19,
-      subdomains: 'abc'
+      subdomains: 'abcd'
     },
     DARK: {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-      maxZoom: 16,
-      subdomains: ''
+      url: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${cartoApiKey}`,
+      attrib: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+      maxZoom: 19,
+      subdomains: 'abcd'
     },
     TOPO: {
-      url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-      attrib: '&copy; OpenStreetMap, SRTM | Map style: &copy; OpenTopoMap',
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
       maxZoom: 17,
-      subdomains: 'abc'
+      subdomains: ''
+    },
+    SATELLITE: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      attrib: 'Tiles &copy; Esri &mdash; Earthstar Geographics',
+      maxZoom: 18,
+      subdomains: ''
     }
   };
 
@@ -66,7 +77,7 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
       const initialCfg = TILE_CONFIGS[mapStyle];
       const initialLayer = window.L.tileLayer(initialCfg.url, {
         attribution: initialCfg.attrib,
-        subdomains: initialCfg.subdomains || 'abc',
+        subdomains: initialCfg.subdomains || 'abcd',
         maxZoom: initialCfg.maxZoom || 19
       }).addTo(map);
 
@@ -284,14 +295,14 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
         {/* Action Controls: Layer Filter & Basemap Switcher */}
         <div className="flex flex-wrap items-center gap-2.5">
           
-          {/* Basemap Style Switcher (Terang / Gelap Radar / Topo) */}
+          {/* Basemap Style Switcher (Terang / Gelap Radar / Topo / Satelit) */}
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
             <button
-              onClick={() => { setMapStyle('OSM'); playSound('click'); }}
+              onClick={() => { setMapStyle('VOYAGER'); playSound('click'); }}
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
-                mapStyle === 'OSM' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                mapStyle === 'VOYAGER' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Peta Terang (OpenStreetMap - Bebas API Key)"
+              title="Tampilan Peta Terang Bersih (CARTO Voyager)"
             >
               <Sun className="w-3.5 h-3.5 text-amber-500" />
               <span className="hidden sm:inline">Terang</span>
@@ -301,7 +312,7 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
                 mapStyle === 'DARK' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Peta Radar Seismologi Malam / Gelap (Esri Dark Canvas)"
+              title="Tampilan Peta Radar Seismologi Malam (CARTO Dark Matter)"
             >
               <Moon className="w-3.5 h-3.5 text-indigo-400" />
               <span className="hidden sm:inline">Radar</span>
@@ -311,10 +322,20 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
                 mapStyle === 'TOPO' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Peta Kontur &amp; Relief Topografi (OpenTopoMap)"
+              title="Peta Relief Topografi &amp; Palung Laut (Esri Topo)"
             >
               <Mountain className="w-3.5 h-3.5 text-emerald-600" />
               <span className="hidden sm:inline">Relief</span>
+            </button>
+            <button
+              onClick={() => { setMapStyle('SATELLITE'); playSound('click'); }}
+              className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
+                mapStyle === 'SATELLITE' ? 'bg-white text-blue-800 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              }`}
+              title="Peta Citra Satelit Seismik Asli (Esri World Imagery)"
+            >
+              <Globe className="w-3.5 h-3.5 text-blue-600" />
+              <span className="hidden sm:inline">Satelit</span>
             </button>
           </div>
 
