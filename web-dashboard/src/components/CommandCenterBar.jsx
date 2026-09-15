@@ -3,6 +3,7 @@ import {
   Activity, Wind, AlertTriangle, ShieldCheck, 
   Radio, Clock, MapPin, TrendingUp 
 } from 'lucide-react';
+import { playSound } from '../utils/audio';
 
 /**
  * =============================================================================
@@ -45,11 +46,20 @@ export default function CommandCenterBar({
             <Activity className="w-3.5 h-3.5 text-red-500" />
             Aktivitas Seismik BMKG
           </span>
-          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
-            isTsunami ? 'bg-red-600 text-white animate-pulse' : 'bg-slate-100 text-slate-700'
-          }`}>
-            {isTsunami ? 'POTENSI TSUNAMI' : 'TERKINI'}
-          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => playSound('emergency')}
+              className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 hover:bg-red-200 text-red-700 transition-colors flex items-center gap-1"
+              title="Klik untuk memutar simulasi nada sirene darurat BMKG"
+            >
+              <span>Uji Sirene</span>
+            </button>
+            <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+              isTsunami ? 'bg-red-600 text-white animate-pulse' : 'bg-slate-100 text-slate-700'
+            }`}>
+              {isTsunami ? 'POTENSI TSUNAMI' : 'TERKINI'}
+            </span>
+          </div>
         </div>
 
         <div className="mt-3 flex items-baseline gap-2">

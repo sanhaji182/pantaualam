@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { calculateDistanceKm, findNearestAirStation } from '../utils/geo';
 import { getCategoryBadge } from './AirQualitySection';
+import { playSound } from '../utils/audio';
 
 /**
  * =============================================================================
@@ -52,6 +53,7 @@ export default function RegionSelector({
 
   // Handler ubah kota terpilih
   const handleCityChange = (kotaId) => {
+    playSound('click');
     setSelectedCityId(kotaId);
     localStorage.setItem('nw_selected_city', kotaId);
   };
@@ -93,11 +95,11 @@ export default function RegionSelector({
     { nama: 'Kota Bandung', id: '32.73.01.1001' },
     { nama: 'Kota Surabaya', id: '35.78.01.1001' },
     { nama: 'Kota Yogyakarta', id: '34.71.01.1001' },
-    { nama: 'Kota Semarang', id: '33.74.01.1001' },
+    { nama: 'Kota Denpasar (Bali)', id: '51.71.01.1001' },
     { nama: 'Kota Medan', id: '12.71.01.1001' },
-    { nama: 'Kota Denpasar', id: '51.71.01.1001' },
     { nama: 'Kota Makassar', id: '73.71.01.1001' },
-    { nama: 'Kota Balikpapan', id: '64.71.01.1001' },
+    { nama: 'Balikpapan (IKN)', id: '64.71.01.1001' },
+    { nama: 'Kota Jayapura', id: '94.71.01.1001' },
   ];
 
   return (
