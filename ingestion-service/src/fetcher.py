@@ -359,13 +359,20 @@ def fetch_volcano_activity():
             desc_match = re.search(r'<span class="tx-11 d-block">(.*?)</span>', content)
             rekomendasi = desc_match.group(1).strip() if desc_match else ""
 
-            # Ekstrak nama gunung dan provinsi
-            entries = re.findall(r'<td>\s*([A-Za-z0-9\s\.\'\-]+?)\s*-\s*([A-Za-z0-9\s\.\'\-]+?)\s*<a href="([^"]+)"', content)
-            for nama, prov, link in entries:
-                nama = nama.strip()
-                prov = prov.strip()
-                if "Tidak ada gunung api" in nama:
+            # Ekstrak teks nama gunung dan provinsi sebelum tag anchor laporan
+            entries = re.findall(r'<td>\s*([^<]+?)\s*<a\s+href="([^"]+)"', content)
+            for full_text, link in entries:
+                full_text = full_text.strip()
+                if "Tidak ada gunung api" in full_text:
                     continue
+
+                if " - " in full_text:
+                    parts = full_text.rsplit(" - ", 1)
+                    nama = parts[0].strip().replace(" - ", "-")
+                    prov = parts[1].strip()
+                else:
+                    nama = full_text
+                    prov = "Indonesia"
 
                 # Normalisasi nama untuk pencocokan koordinat
                 clean_nama = nama.lower().replace("gunung ", "").strip()
