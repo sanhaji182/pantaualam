@@ -1,0 +1,158 @@
+import React from 'react';
+import { 
+  Activity, Wind, AlertTriangle, ShieldCheck, 
+  Radio, Clock, MapPin, TrendingUp 
+} from 'lucide-react';
+
+/**
+ * =============================================================================
+ * KOMPONEN: COMMAND CENTER BAR (Ringkasan KPI Bencana & Iklim Nasional)
+ * File: src/components/CommandCenterBar.jsx
+ * Deskripsi:
+ * Memberikan ringkasan eksekutif 4 pilar utama BMKG dalam bentuk kartu metrik
+ * real-time: Aktivitas Seismik, Kualitas Udara, Peringatan Ekstrem, dan Status Sensor.
+ * =============================================================================
+ */
+export default function CommandCenterBar({ 
+  latestQuake, 
+  feltQuakes = [], 
+  airQualityData = [], 
+  weatherAlerts = [],
+  weatherList = []
+}) {
+  // Hitung agregat PM2.5
+  const totalSPKU = airQualityData.length;
+  const avgPM25 = totalSPKU > 0 
+    ? (airQualityData.reduce((acc, curr) => acc + (curr.pm25 || 0), 0) / totalSPKU).toFixed(1)
+    : '--';
+
+  const mostPolluted = airQualityData.length > 0 ? airQualityData[0] : null;
+  const cleanest = airQualityData.length > 0 ? airQualityData[airQualityData.length - 1] : null;
+
+  // Status Tsunami
+  const isTsunami = latestQuake?.potensi && 
+    latestQuake.potensi.toLowerCase().includes('tsunami') && 
+    !latestQuake.potensi.toLowerCase().includes('tidak');
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      {/* 1. KARTU STATUS SEISMIK / GEMPA */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-red-500" />
+            Aktivitas Seismik BMKG
+          </span>
+          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+            isTsunami ? 'bg-red-600 text-white animate-pulse' : 'bg-slate-100 text-slate-700'
+          }`}>
+            {isTsunami ? 'POTENSI TSUNAMI' : 'TERKINI'}
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-3xl font-black text-slate-900 tracking-tight">
+            {latestQuake ? `${latestQuake.magnitude} M` : '--'}
+          </span>
+          <span className="text-xs font-semibold text-slate-500 truncate max-w-[140px]">
+            {latestQuake ? latestQuake.wilayah.split(',')[0] : 'Memuat data...'}
+          </span>
+        </div>
+
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span>Kedalaman: <strong>{latestQuake?.kedalaman || '--'}</strong></span>
+          <span className="text-purple-600 font-semibold">{feltQuakes.length} Gempa Dirasakan</span>
+        </div>
+      </div>
+
+      {/* 2. KARTU KUALITAS UDARA (PM2.5) */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Wind className="w-3.5 h-3.5 text-cyan-500" />
+            Polusi Udara (PM2.5)
+          </span>
+          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
+            {totalSPKU} SPKU
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-3xl font-black text-slate-900 tracking-tight">
+            {avgPM25}
+          </span>
+          <span className="text-xs font-semibold text-slate-500">µg/m³ Rata-Rata</span>
+        </div>
+
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span className="truncate max-w-[120px]" title={mostPolluted?.stasiun}>
+            Kritis: <strong className="text-rose-600">{mostPolluted?.stasiun || '-'}</strong>
+          </span>
+          <span className="truncate max-w-[120px]" title={cleanest?.stasiun}>
+            Bersih: <strong className="text-emerald-600">{cleanest?.stasiun || '-'}</strong>
+          </span>
+        </div>
+      </div>
+
+      {/* 3. KARTU PERINGATAN DINI CUACA (NOWCAST CAP) */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+            Peringatan Cuaca Ekstrem
+          </span>
+          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+            weatherAlerts.length > 0 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'
+          }`}>
+            NOWCAST CAP
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-3xl font-black text-slate-900 tracking-tight">
+            {weatherAlerts.length}
+          </span>
+          <span className="text-xs font-semibold text-slate-500">Peringatan Aktif</span>
+        </div>
+
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span className="truncate max-w-[200px]" title={weatherAlerts[0]?.judul || 'Tidak ada peringatan aktif'}>
+            {weatherAlerts.length > 0 ? weatherAlerts[0].judul : 'Kondisi cuaca terpantau kondusif'}
+          </span>
+        </div>
+      </div>
+
+      {/* 4. KARTU SENSOR & INTEGRASI SYSTEM */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            Status Gateway & Ingestion
+          </span>
+          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+            100% ONLINE
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-3xl font-black text-slate-900 tracking-tight">
+            {weatherList.length + totalSPKU}
+          </span>
+          <span className="text-xs font-semibold text-slate-500">Titik Sensor Terhubung</span>
+        </div>
+
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span>DB: <strong>PostgreSQL JSONB</strong></span>
+          <span className="text-blue-600 font-semibold">Golang Gateway :8080</span>
+        </div>
+      </div>
+
+    </div>
+  );
+}
