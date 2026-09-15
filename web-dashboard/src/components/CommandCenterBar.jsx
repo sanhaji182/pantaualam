@@ -39,7 +39,7 @@ export default function CommandCenterBar({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
       {/* 1. KARTU STATUS SEISMIK / GEMPA */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+      <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-red-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
@@ -78,7 +78,7 @@ export default function CommandCenterBar({
       </div>
 
       {/* 2. KARTU KUALITAS UDARA (PM2.5) */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+      <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-cyan-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
@@ -108,7 +108,7 @@ export default function CommandCenterBar({
       </div>
 
       {/* 3. KARTU PERINGATAN DINI CUACA (NOWCAST CAP) */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+      <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-amber-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
@@ -137,7 +137,7 @@ export default function CommandCenterBar({
       </div>
 
       {/* 4. KARTU SENSOR & INTEGRASI SYSTEM */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden group">
+      <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-emerald-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">

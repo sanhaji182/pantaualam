@@ -32,6 +32,7 @@ export function playSound(type = 'chime') {
     const ctx = getAudioContext();
     if (!ctx) return;
 
+    const soundType = (type || '').toLowerCase();
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -39,7 +40,7 @@ export function playSound(type = 'chime') {
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    if (type === 'click') {
+    if (soundType === 'click') {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(1200, now);
       gain.gain.setValueAtTime(0.03, now);
