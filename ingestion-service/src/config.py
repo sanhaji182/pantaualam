@@ -23,7 +23,7 @@ class Config:
     DB_PORT = int(os.getenv("DB_PORT", "5432"))
     DB_USER = os.getenv("DB_USER", "postgres")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "postgres123")
-    DB_NAME = os.getenv("DB_NAME", "nusantara_weather")
+    DB_NAME = os.getenv("DB_NAME", "pantaualam")
 
     # -------------------------------------------------------------------------
     # 2. Daftar Endpoint Resmi API Terbuka BMKG

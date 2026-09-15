@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"nusantara-weather/core-gateway/internal/model"
+	"pantaualam/core-gateway/internal/model"
 )
 
 // CuacaHandler mengelola request HTTP terkait data cuaca

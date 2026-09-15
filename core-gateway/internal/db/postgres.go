@@ -17,7 +17,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq" // Driver PostgreSQL resmi untuk Go
-	"nusantara-weather/core-gateway/internal/config"
+	"pantaualam/core-gateway/internal/config"
 )
 
 // InitDB menginisialisasi koneksi ke PostgreSQL dan mengembalikan *sql.DB

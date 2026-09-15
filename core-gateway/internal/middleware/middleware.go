@@ -19,8 +19,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"nusantara-weather/core-gateway/internal/config"
-	"nusantara-weather/core-gateway/internal/model"
+	"pantaualam/core-gateway/internal/config"
+	"pantaualam/core-gateway/internal/model"
 )
 
 type contextKey string

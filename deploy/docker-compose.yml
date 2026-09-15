@@ -10,10 +10,10 @@ services:
   # ---------------------------------------------------------------------------
   db:
     image: postgres:16-alpine
-    container_name: nw_postgres
+    container_name: pantaualam_postgres
     restart: always
     environment:
-      POSTGRES_DB: nusantara_weather
+      POSTGRES_DB: pantaualam
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
     ports:
@@ -21,13 +21,13 @@ services:
       - "5432:5432"
     volumes:
       # Volume untuk penyimpanan data permanen (data tidak hilang saat container restart)
-      - pgdata:/var/lib/postgresql/data
+      - pantaualam_pgdata:/var/lib/postgresql/data
       # Inisialisasi skema tabel dan seed data awal otomatis
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
-      - nw_network
+      - pantaualam_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d nusantara_weather"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pantaualam"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -39,7 +39,7 @@ services:
     build:
       context: ../ingestion-service
       dockerfile: Dockerfile
-    container_name: nw_ingestion
+    container_name: pantaualam_ingestion
     restart: always
     depends_on:
       db:
@@ -49,11 +49,11 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres123
-      DB_NAME: nusantara_weather
+      DB_NAME: pantaualam
       SYNC_INTERVAL_SECONDS: 900 # Tarik data tiap 15 menit
       HTTP_TIMEOUT: 15
     networks:
-      - nw_network
+      - pantaualam_network
 
   # ---------------------------------------------------------------------------
   # 3. CORE GATEWAY: GOLANG REST API (Port 8080)
@@ -62,7 +62,7 @@ services:
     build:
       context: ../core-gateway
       dockerfile: Dockerfile
-    container_name: nw_gateway
+    container_name: pantaualam_gateway
     restart: always
     depends_on:
       db:
@@ -75,10 +75,10 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres123
-      DB_NAME: nusantara_weather
-      JWT_SECRET: kunci_rahasia_jwt_nusantara_weather_prod_secure_key
+      DB_NAME: pantaualam
+      JWT_SECRET: kunci_rahasia_jwt_pantaualam_prod_secure_key
     networks:
-      - nw_network
+      - pantaualam_network
 
   # ---------------------------------------------------------------------------
   # 4. WEB DASHBOARD: REACT JS FRONTEND (Port 3000)
@@ -87,22 +87,22 @@ services:
     build:
       context: ../web-dashboard
       dockerfile: Dockerfile
-    container_name: nw_web
+    container_name: pantaualam_web
     restart: always
     ports:
       - "3000:80"
     depends_on:
       - gateway
     networks:
-      - nw_network
+      - pantaualam_network
 
 # -----------------------------------------------------------------------------
 # JARINGAN & VOLUME DOCKER
 # -----------------------------------------------------------------------------
 networks:
-  nw_network:
+  pantaualam_network:
     driver: bridge
 
 volumes:
-  pgdata:
+  pantaualam_pgdata:
     driver: local

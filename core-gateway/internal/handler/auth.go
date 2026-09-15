@@ -18,9 +18,9 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
-	"nusantara-weather/core-gateway/internal/config"
-	"nusantara-weather/core-gateway/internal/middleware"
-	"nusantara-weather/core-gateway/internal/model"
+	"pantaualam/core-gateway/internal/config"
+	"pantaualam/core-gateway/internal/middleware"
+	"pantaualam/core-gateway/internal/model"
 )
 
 // AuthHandler mengelola request registrasi, login, dan bookmark

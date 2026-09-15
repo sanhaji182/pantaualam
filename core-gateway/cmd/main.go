@@ -20,11 +20,11 @@ import (
 	"syscall"
 	"time"
 
-	"nusantara-weather/core-gateway/internal/config"
-	"nusantara-weather/core-gateway/internal/db"
-	"nusantara-weather/core-gateway/internal/handler"
-	"nusantara-weather/core-gateway/internal/middleware"
-	"nusantara-weather/core-gateway/internal/model"
+	"pantaualam/core-gateway/internal/config"
+	"pantaualam/core-gateway/internal/db"
+	"pantaualam/core-gateway/internal/handler"
+	"pantaualam/core-gateway/internal/middleware"
+	"pantaualam/core-gateway/internal/model"
 )
 
 func main() {

@@ -69,7 +69,7 @@ Sistem PantauAlam dibangun dengan arsitektur microservices modular berstandar in
 ### Opsi A: Menggunakan Docker Compose (Sangat Direkomendasikan)
 Cukup jalankan satu perintah berikut di terminal:
 ```bash
-cd nusantara-weather/deploy
+cd pantaualam/deploy
 docker compose up --build -d
 ```
 Sistem akan otomatis:
@@ -92,7 +92,7 @@ Jalankan file `deploy/database/init.sql` pada PostgreSQL lokal Anda.
 
 #### 2. Ingestion Service (Python Worker)
 ```bash
-cd nusantara-weather/ingestion-service
+cd pantaualam/ingestion-service
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -106,14 +106,14 @@ python3 src/main.py
 
 #### 3. Core API Gateway (Golang)
 ```bash
-cd nusantara-weather/core-gateway
+cd pantaualam/core-gateway
 go run cmd/main.go
 ```
 Akses API di browser: `http://localhost:8080/api/v1/gempa/terkini`
 
 #### 4. Web Dashboard (React JS)
 ```bash
-cd nusantara-weather/web-dashboard
+cd pantaualam/web-dashboard
 npm install
 npm run dev
 ```
@@ -121,7 +121,7 @@ Buka browser di `http://localhost:3000`
 
 #### 5. Mobile App (React Native Expo)
 ```bash
-cd nusantara-weather/mobile-app
+cd pantaualam/mobile-app
 npm install
 npx expo start
 ```

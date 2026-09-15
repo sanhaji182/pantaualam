@@ -1,4 +1,4 @@
-module nusantara-weather/core-gateway
+module pantaualam/core-gateway
 
 go 1.22
 

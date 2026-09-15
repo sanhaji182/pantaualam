@@ -33,8 +33,8 @@ func LoadConfig() *Config {
 		DBPort:     getEnv("DB_PORT", "5432"),
 		DBUser:     getEnv("DB_USER", "postgres"),
 		DBPassword: getEnv("DB_PASSWORD", "postgres123"),
-		DBName:     getEnv("DB_NAME", "nusantara_weather"),
-		JWTSecret:  getEnv("JWT_SECRET", "kunci_rahasia_jwt_nusantara_weather_prod_secure_key"),
+		DBName:     getEnv("DB_NAME", "pantaualam"),
+		JWTSecret:  getEnv("JWT_SECRET", "kunci_rahasia_jwt_pantaualam_prod_secure_key"),
 	}
 }
 

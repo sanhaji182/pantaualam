@@ -4,7 +4,7 @@
 > Status: **Enterprise-Grade Production Ready**  
 > Orchestrator: **Sanhaji** (System Orchestrator)  
 > Lisensi: **MIT License (Full Open Source)**  
-> Basis Kode: Monorepo di folder `nusantara-weather/`
+> Basis Kode: Monorepo di folder `pantaualam/`
 
 ---
 
@@ -22,7 +22,7 @@ Proyek ini adalah sistem pemantau cuaca dan peringatan bencana nasional yang men
 
 ## 2. STRUKTUR DIREKTORI REPOSITORI
 ```text
-nusantara-weather/
+pantaualam/
 ├── AGENTS.md                    # File ini (panduan instruksi developer & AI)
 ├── README.md                    # Dokumentasi utama & cara menjalankan
 ├── ALUR_DAN_ARSITEKTUR.md       # Dokumentasi detail alur data & diagram sistem
@@ -106,7 +106,7 @@ Bagi semua agent dan developer yang berkontribusi pada repositori ini:
 ## 5. CARA MENJALANKAN SISTEM SECARA LOKAL
 ### Menggunakan Docker Compose (Direkomendasikan):
 ```bash
-cd nusantara-weather/deploy
+cd pantaualam/deploy
 docker compose up --build -d
 ```
 Sistem akan otomatis menjalankan:
@@ -118,18 +118,18 @@ Sistem akan otomatis menjalankan:
 1. **Database:** Jalankan `deploy/database/init.sql` di PostgreSQL lokal.
 2. **Ingestion Service:**
    ```bash
-   cd nusantara-weather/ingestion-service
+   cd pantaualam/ingestion-service
    pip install -r requirements.txt
    python3 src/main.py
    ```
 3. **Core Gateway:**
    ```bash
-   cd nusantara-weather/core-gateway
+   cd pantaualam/core-gateway
    go run cmd/main.go
    ```
 4. **Web Dashboard:**
    ```bash
-   cd nusantara-weather/web-dashboard
+   cd pantaualam/web-dashboard
    npm install
    npm run dev
    ```

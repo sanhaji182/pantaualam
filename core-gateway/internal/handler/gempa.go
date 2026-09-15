@@ -17,7 +17,7 @@ import (
 	"sync"
 	"time"
 
-	"nusantara-weather/core-gateway/internal/model"
+	"pantaualam/core-gateway/internal/model"
 )
 
 // In-Memory Cache untuk menghindari query berulang ke database dalam waktu berdekatan

@@ -17,7 +17,7 @@ import (
 	"strconv"
 	"strings"
 
-	"nusantara-weather/core-gateway/internal/model"
+	"pantaualam/core-gateway/internal/model"
 )
 
 // GunungHandler mengelola request HTTP terkait pemantauan aktivitas gunung api
