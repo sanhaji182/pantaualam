@@ -28,41 +28,36 @@ export default function EarthquakeMap({
   const tileLayerRef = useRef(null);
   const markersRef = useRef({});
 
-  const [mapStyle, setMapStyle] = useState('VOYAGER'); // 'VOYAGER', 'DARK', 'TOPO', 'SATELLITE'
+  const [mapStyle, setMapStyle] = useState('STREET'); // 'STREET', 'DARK', 'TOPO', 'SATELLITE'
   const [activeLayer, setActiveLayer] = useState('ALL'); // 'ALL', 'M5', 'DIRASAKAN'
   const [showVolcanoLayer, setShowVolcanoLayer] = useState(true); // Toggle layer gunung api PVMBG
   const [magFilter, setMagFilter] = useState('ALL'); // 'ALL', 'M4', 'M5', 'M6'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedQuakeFocus, setSelectedQuakeFocus] = useState(null);
 
-  // Ambil API key CARTO opsional dari environment (jika diset, watermark otomatis hilang)
-  const cartoApiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_CARTO_API_KEY)
-    ? `?key=${import.meta.env.VITE_CARTO_API_KEY}`
-    : '';
-
-  // Konfigurasi basemap presisi dengan garis pantai dan batas wilayah yang rapi
+  // Konfigurasi basemap 100% GRATIS & Bebas API Key / Tanpa Watermark (Esri ArcGIS Suite)
   const TILE_CONFIGS = {
-    VOYAGER: {
-      url: `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${cartoApiKey}`,
-      attrib: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    STREET: {
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+      attrib: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; World Street Map',
       maxZoom: 19,
-      subdomains: 'abcd'
+      subdomains: ''
     },
     DARK: {
-      url: `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${cartoApiKey}`,
-      attrib: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-      maxZoom: 19,
-      subdomains: 'abcd'
+      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      attrib: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Dark Canvas',
+      maxZoom: 16,
+      subdomains: ''
     },
     TOPO: {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-      attrib: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-      maxZoom: 17,
+      attrib: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; World Topo Relief',
+      maxZoom: 18,
       subdomains: ''
     },
     SATELLITE: {
       url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      attrib: 'Tiles &copy; Esri &mdash; Earthstar Geographics',
+      attrib: '&copy; <a href="https://www.esri.com/">Esri</a> &mdash; World Imagery',
       maxZoom: 18,
       subdomains: ''
     }
@@ -386,11 +381,11 @@ export default function EarthquakeMap({
           {/* Basemap Style Switcher (Terang / Gelap Radar / Topo / Satelit) */}
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
             <button
-              onClick={() => { setMapStyle('VOYAGER'); playSound('click'); }}
+              onClick={() => { setMapStyle('STREET'); playSound('click'); }}
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
-                mapStyle === 'VOYAGER' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+                mapStyle === 'STREET' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Peta Terang Bersih (CARTO Voyager)"
+              title="Tampilan Peta Terang Bersih Bebas Watermark (Esri World Street Map)"
             >
               <Sun className="w-3.5 h-3.5 text-amber-500" />
               <span className="hidden sm:inline">Terang</span>
@@ -400,7 +395,7 @@ export default function EarthquakeMap({
               className={`px-2.5 py-1 rounded-xl transition-all flex items-center gap-1 ${
                 mapStyle === 'DARK' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
               }`}
-              title="Tampilan Peta Radar Seismologi Malam (CARTO Dark Matter)"
+              title="Tampilan Peta Radar Seismologi Malam Bebas Watermark (Esri Dark Canvas)"
             >
               <Moon className="w-3.5 h-3.5 text-indigo-400" />
               <span className="hidden sm:inline">Radar</span>
