@@ -130,4 +130,65 @@ export async function getAirQualityData() {
   }
 }
 
+/**
+ * Mengambil status tingkat aktivitas gunung api Indonesia (PVMBG/MAGMA)
+ * @param {string|number} [level] - Optional filter level angka (1, 2, 3, 4)
+ */
+export async function getVolcanoList(level = '') {
+  try {
+    const url = level ? `${API_BASE_URL}/gunung-api?level=${level}` : `${API_BASE_URL}/gunung-api`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Gagal memuat data status gunung api');
+    const json = await res.json();
+    return json.data || [];
+  } catch (error) {
+    console.error('API Error (getVolcanoList):', error);
+    return [];
+  }
+}
+
+/**
+ * Mengambil riwayat letusan dan erupsi gunung api terkini (PVMBG/MAGMA)
+ */
+export async function getRecentEruptions(limit = 20) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/gunung-api/erupsi?limit=${limit}`);
+    if (!res.ok) throw new Error('Gagal memuat riwayat erupsi terkini');
+    const json = await res.json();
+    return json.data || [];
+  } catch (error) {
+    console.error('API Error (getRecentEruptions):', error);
+    return [];
+  }
+}
+
+/**
+ * Mengambil ringkasan statistik status aktivitas gunung api
+ */
+export async function getVolcanoSummary() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/gunung-api/summary`);
+    if (!res.ok) throw new Error('Gagal memuat ringkasan statistik gunung api');
+    const json = await res.json();
+    return json.data || {
+      total_gunung: 0,
+      level_iv_awas: 0,
+      level_iii_siaga: 0,
+      level_ii_waspada: 0,
+      level_i_normal: 0,
+      total_erupsi_aktif: 0,
+    };
+  } catch (error) {
+    console.error('API Error (getVolcanoSummary):', error);
+    return {
+      total_gunung: 0,
+      level_iv_awas: 0,
+      level_iii_siaga: 0,
+      level_ii_waspada: 0,
+      level_i_normal: 0,
+      total_erupsi_aktif: 0,
+    };
+  }
+}
+
 

@@ -13,9 +13,9 @@
 ---
 
 ## 1. TENTANG PROYEK
-**NusantaraWeather** adalah sistem monitoring cuaca, kegempaan, dan peringatan dini bencana nasional yang mengolah data real-time dari API Terbuka Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) Indonesia.
+**NusantaraWeather** adalah sistem monitoring cuaca, kegempaan, aktivitas gunung api, dan peringatan dini bencana nasional yang mengolah data real-time dari API Terbuka Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) serta Pusat Vulkanologi dan Mitigasi Bencana Geologi (PVMBG / MAGMA Indonesia).
 
-Sistem ini dirancang dengan prinsip **Zero-Maintenance**, di mana data cuaca per jam dan gempa bumi ditarik, dibersihkan, dan disajikan secara otomatis 24/7 tanpa membutuhkan operasional manual harian.
+Sistem ini dirancang dengan prinsip **Zero-Maintenance**, di mana data cuaca per jam, gempa bumi tektonik, kualitas udara PM2.5, status 68+ gunung api aktif, serta buletin letusan/erupsi ditarik, dibersihkan, dan disajikan secara otomatis 24/7 tanpa membutuhkan operasional manual harian.
 
 ---
 

@@ -129,4 +129,40 @@ type KualitasUdara struct {
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
+// GunungApi merepresentasikan status tingkat aktivitas gunung api Indonesia (PVMBG/MAGMA)
+type GunungApi struct {
+	ID             int       `json:"id"`
+	Nama           string    `json:"nama"`
+	Provinsi       string    `json:"provinsi"`
+	LevelAktivitas string    `json:"level_aktivitas"`
+	LevelAngka     int       `json:"level_angka"`
+	Latitude       string    `json:"latitude"`
+	Longitude      string    `json:"longitude"`
+	TinggiMeter    int       `json:"tinggi_meter"`
+	Rekomendasi    string    `json:"rekomendasi"`
+	UpdatedAt      time.Time `json:"updated_at"`
+}
+
+// ErupsiTerkini merepresentasikan riwayat letusan & kolom abu vulkanik dari PVMBG
+type ErupsiTerkini struct {
+	ID              int       `json:"id"`
+	GunungNama      string    `json:"gunung_nama"`
+	WaktuErupsi     string    `json:"waktu_erupsi"`
+	TinggiKolomAbu  string    `json:"tinggi_kolom_abu"`
+	ArahAbu         string    `json:"arah_abu"`
+	AmplitudoDurasi string    `json:"amplitudo_durasi"`
+	Deskripsi       string    `json:"deskripsi"`
+	CreatedAt       time.Time `json:"created_at"`
+}
+
+// GunungSummary merepresentasikan statistik ringkasan status gunung api di Indonesia
+type GunungSummary struct {
+	TotalGunung      int `json:"total_gunung"`
+	LevelIVAwas      int `json:"level_iv_awas"`
+	LevelIIISiaga    int `json:"level_iii_siaga"`
+	LevelIIWaspada   int `json:"level_ii_waspada"`
+	LevelINormal     int `json:"level_i_normal"`
+	TotalErupsiAktif int `json:"total_erupsi_aktif"`
+}
+
 

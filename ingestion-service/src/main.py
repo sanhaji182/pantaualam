@@ -17,7 +17,10 @@ from src.db import (
     upsert_earthquake_data,
     upsert_weather_data,
     upsert_weather_alert,
-    upsert_air_quality
+    upsert_air_quality,
+    init_volcano_tables,
+    upsert_volcano_data,
+    insert_eruption_report
 )
 from src.fetcher import (
     fetch_latest_earthquake,
@@ -25,7 +28,9 @@ from src.fetcher import (
     fetch_felt_earthquakes,
     fetch_extreme_weather_alerts,
     fetch_weather_forecast,
-    fetch_air_quality
+    fetch_air_quality,
+    fetch_volcano_activity,
+    fetch_recent_eruptions
 )
 
 # Konfigurasi format logging di konsol
@@ -113,6 +118,27 @@ def sync_all_data():
         logger.info(f"Berhasil memperbarui {len(air_records)} data stasiun kualitas udara.")
     except Exception as e:
         logger.error(f"Terjadi kesalahan saat memproses data kualitas udara: {e}")
+
+    # -------------------------------------------------------------------------
+    # LANGKAH 6: SINKRONISASI STATUS GUNUNG API & ERUPSI TERKINI (PVMBG/MAGMA)
+    # -------------------------------------------------------------------------
+    try:
+        logger.info("Memulai inisialisasi tabel dan sinkronisasi data gunung api...")
+        init_volcano_tables()
+
+        # 6A. Update tingkat aktivitas seluruh gunung api aktif
+        volcanoes = fetch_volcano_activity()
+        for v in volcanoes:
+            upsert_volcano_data(v)
+        logger.info(f"Berhasil memperbarui {len(volcanoes)} status aktivitas gunung api.")
+
+        # 6B. Update riwayat letusan dan erupsi terkini
+        eruptions = fetch_recent_eruptions()
+        for erup in eruptions:
+            insert_eruption_report(erup)
+        logger.info(f"Berhasil memproses {len(eruptions)} laporan letusan/erupsi terkini.")
+    except Exception as e:
+        logger.error(f"Terjadi kesalahan saat memproses data gunung api: {e}")
 
     logger.info(">>> SIKLUS SINKRONISASI SELESAI DENGAN SUKSES <<<\n")
 

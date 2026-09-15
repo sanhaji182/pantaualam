@@ -23,6 +23,7 @@ Dokumen ini menjelaskan secara rinci bagaimana seluruh bagian aplikasi bekerja s
 | - Mengambil Peringatan Dini Cuaca Ekstrem (CAP RSS Nowcast) |
 | - Mengambil Cuaca Wilayah 3 Hari per Kecamatan/Kota         |
 | - Mengambil Baku Mutu Kualitas Udara PM2.5 (25+ Stasiun)    |
+| - Mengambil Status Gunung Api & Erupsi PVMBG / MAGMA ESDM   |
 +------------------------------+------------------------------+
                                |
                                | (2. UPSERT SQL & JSONB)
@@ -35,6 +36,8 @@ Dokumen ini menjelaskan secara rinci bagaimana seluruh bagian aplikasi bekerja s
 |  - wilayah_kota                    - gempa_terkini.raw_data |
 |  - peringatan_dini (CAP RSS)                                |
 |  - kualitas_udara (PM2.5 SPKU)                              |
+|  - gunung_api (Level I s/d IV)                              |
+|  - erupsi_terkini (Buletin Letusan)                         |
 |  - users & user_bookmarks                                   |
 |                                                             |
 |  * Dilengkapi GIN Index untuk pencarian JSON super cepat    |
@@ -48,7 +51,7 @@ Dokumen ini menjelaskan secara rinci bagaimana seluruh bagian aplikasi bekerja s
 |  - Menyediakan endpoint REST API di port 8080               |
 |  - In-Memory Cache (sync.Map): Cache data gempa selama 60dtk|
 |    sehingga respon API secepat kilat (<30ms)                |
-|  - Endpoint /api/v1/kualitas-udara, /cuaca, /gempa, /auth   |
+|  - Endpoint /api/v1/gunung-api, /erupsi, /cuaca, /gempa     |
 |  - JWT Middleware untuk endpoint terproteksi (Bookmark Kota)|
 |  - CORS Handler agar Web & Mobile bisa akses tanpa kendala  |
 +------------------------------+------------------------------+

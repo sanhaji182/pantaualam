@@ -9,6 +9,7 @@ import WeatherAlertBar from './components/WeatherAlertBar';
 import AirQualitySection from './components/AirQualitySection';
 import ArchitectureModal from './components/ArchitectureModal';
 import RegionSelector from './components/RegionSelector';
+import VolcanoSection from './components/VolcanoSection';
 import { 
   getLatestEarthquake, 
   getRecentEarthquakes, 
@@ -16,12 +17,15 @@ import {
   getAllWeatherSummary, 
   getWeatherDetail, 
   getExtremeWeatherAlerts, 
-  getAirQualityData 
+  getAirQualityData,
+  getVolcanoList,
+  getRecentEruptions,
+  getVolcanoSummary
 } from './services/api';
 import { 
   RefreshCw, X, ShieldCheck, Database, Server, Cpu, 
   Globe, Code2, GitBranch, Heart, LayoutDashboard, 
-  Activity, Wind, Sun, Layers 
+  Activity, Wind, Sun, Layers, Flame 
 } from 'lucide-react';
 import { playSound } from './utils/audio';
 
@@ -48,6 +52,10 @@ export default function App() {
   const [weatherAlerts, setWeatherAlerts] = useState([]);
   const [weatherList, setWeatherList] = useState([]);
   const [airQualityList, setAirQualityList] = useState([]);
+  const [volcanoes, setVolcanoes] = useState([]);
+  const [eruptions, setEruptions] = useState([]);
+  const [volcanoSummary, setVolcanoSummary] = useState(null);
+  const [focusedVolcano, setFocusedVolcano] = useState(null);
   const [selectedCityDetail, setSelectedCityDetail] = useState(null);
   const [shakemapModalUrl, setShakemapModalUrl] = useState(null);
   const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
@@ -55,18 +63,21 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [lastSyncTime, setLastSyncTime] = useState(new Date());
-  const [activeSectionTab, setActiveSectionTab] = useState('ALL'); // 'ALL', 'SEISMIC', 'AIR', 'WEATHER'
+  const [activeSectionTab, setActiveSectionTab] = useState('ALL'); // 'ALL', 'SEISMIC', 'VOLCANO', 'AIR', 'WEATHER'
 
   // Fungsi memuat seluruh data dari Core API Gateway Golang
   const loadDashboardData = async () => {
     try {
-      const [quake, quakes, felts, alerts, weather, air] = await Promise.all([
+      const [quake, quakes, felts, alerts, weather, air, volcanoList, eruptionList, vSummary] = await Promise.all([
         getLatestEarthquake(),
         getRecentEarthquakes(),
         getFeltEarthquakes(),
         getExtremeWeatherAlerts(),
         getAllWeatherSummary(),
-        getAirQualityData()
+        getAirQualityData(),
+        getVolcanoList(),
+        getRecentEruptions(),
+        getVolcanoSummary()
       ]);
 
       setLatestQuake(quake);
@@ -75,12 +86,25 @@ export default function App() {
       setWeatherAlerts(alerts);
       setWeatherList(weather);
       setAirQualityList(air);
+      setVolcanoes(volcanoList);
+      setEruptions(eruptionList);
+      setVolcanoSummary(vSummary);
       setLastSyncTime(new Date());
     } catch (error) {
       console.error('Kesalahan saat memuat data dashboard:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  // Handler fokus kamera peta ke lokasi gunung api tertentu
+  const handleFocusVolcano = (volcano) => {
+    setFocusedVolcano(volcano);
+    playSound('click');
+    const mapElement = document.getElementById('seismik');
+    if (mapElement) {
+      mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
@@ -178,6 +202,23 @@ export default function App() {
               </button>
 
               <button
+                onClick={() => { setActiveSectionTab('VOLCANO'); playSound('CLICK'); }}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                  activeSectionTab === 'VOLCANO'
+                    ? 'bg-orange-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                }`}
+              >
+                <Flame className="w-3.5 h-3.5 text-orange-300" />
+                <span>Gunung Api &amp; Erupsi</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
+                  activeSectionTab === 'VOLCANO' ? 'bg-orange-700 text-orange-100' : 'bg-slate-100 text-slate-500'
+                }`}>
+                  {volcanoes?.length || 68}
+                </span>
+              </button>
+
+              <button
                 onClick={() => { setActiveSectionTab('AIR'); playSound('CLICK'); }}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
                   activeSectionTab === 'AIR'
@@ -225,7 +266,7 @@ export default function App() {
                 onClick={handleManualRefresh}
                 disabled={refreshing}
                 className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-xs hover:shadow-sm transition-all disabled:opacity-70"
-                title="Sinkronkan data terbaru dari API BMKG"
+                title="Sinkronkan data terbaru dari API BMKG & PVMBG"
               >
                 <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
                 <span>{refreshing ? 'Sinkron...' : 'Segarkan'}</span>
@@ -238,13 +279,14 @@ export default function App() {
         {/* Ticker Peringatan Dini Cuaca Ekstrem (BMKG Nowcast CAP) */}
         <WeatherAlertBar alerts={weatherAlerts} />
 
-        {/* Command Center Bar (4 Metrik Eksekutif) */}
+        {/* Command Center Bar (5 Metrik Eksekutif) */}
         <CommandCenterBar
           latestQuake={latestQuake}
           feltQuakes={feltQuakes}
           airQualityData={airQualityList}
           weatherAlerts={weatherAlerts}
           weatherList={weatherList}
+          volcanoSummary={volcanoSummary}
         />
 
         {/* 6. Pemilihan Wilayah & Hero Spotlight Pantauan Lokal (Hanya ditampilkan pada Semua Modul & Tab Cuaca) */}
@@ -305,6 +347,55 @@ export default function App() {
               latestQuake={latestQuake}
               recentQuakes={recentQuakes}
               feltQuakes={feltQuakes}
+              volcanoes={volcanoes}
+              focusedVolcano={focusedVolcano}
+            />
+          </section>
+        )}
+
+        {/* 7B. MODUL 01B: Aktivitas Gunung Api & Erupsi Terkini (PVMBG) */}
+        {(activeSectionTab === 'ALL' || activeSectionTab === 'VOLCANO') && (
+          <section className="space-y-4 pt-4 animate-fadeIn" id="volcano">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-600 shadow-xs">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-orange-700 bg-orange-100 px-2 py-0.5 rounded-md border border-orange-200">
+                      MODUL 01B &bull; VULKANOLOGI
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-mono">Sensors: PVMBG / MAGMA ESDM</span>
+                  </div>
+                  <h3 className="text-lg font-extrabold text-slate-900 leading-snug">
+                    Tingkat Aktivitas Gunung Api &amp; Buletin Letusan Terkini
+                  </h3>
+                </div>
+              </div>
+              {activeSectionTab === 'ALL' ? (
+                <button
+                  onClick={() => { setActiveSectionTab('VOLCANO'); playSound('CLICK'); }}
+                  className="text-xs font-bold text-orange-600 hover:text-orange-800 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-orange-50 hover:border-orange-200 transition-all shadow-xs"
+                >
+                  <span>Fokus Modul Gunung Api</span>
+                  <span>&rarr;</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setActiveSectionTab('ALL'); playSound('CLICK'); }}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-xs"
+                >
+                  <span>&larr; Tampilkan Semua Modul</span>
+                </button>
+              )}
+            </div>
+
+            <VolcanoSection
+              volcanoes={volcanoes}
+              eruptions={eruptions}
+              summary={volcanoSummary}
+              onFocusVolcano={handleFocusVolcano}
             />
           </section>
         )}

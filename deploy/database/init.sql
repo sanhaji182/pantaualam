@@ -125,8 +125,44 @@ CREATE TABLE IF NOT EXISTS kualitas_udara (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_kualitas_pm25 ON kualitas_udara (pm25 DESC);
+-- ====================================================================
+-- TABEL 4D: STATUS AKTIVITAS GUNUNG API (PVMBG / MAGMA INDONESIA)
+-- Penjelasan: Menyimpan status tingkat aktivitas gunung api Indonesia
+-- (Level IV Awas, Level III Siaga, Level II Waspada, Level I Normal)
+-- beserta koordinat, ketinggian mdpl, dan zona rekomendasi PVMBG.
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS gunung_api (
+    id SERIAL PRIMARY KEY,
+    nama VARCHAR(100) UNIQUE NOT NULL,
+    provinsi VARCHAR(100) NOT NULL,
+    level_aktivitas VARCHAR(50) NOT NULL,
+    level_angka INTEGER NOT NULL DEFAULT 1,
+    latitude VARCHAR(20),
+    longitude VARCHAR(20),
+    tinggi_meter INTEGER DEFAULT 0,
+    rekomendasi TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
+CREATE INDEX IF NOT EXISTS idx_gunung_level ON gunung_api (level_angka DESC);
+
+-- ====================================================================
+-- TABEL 4E: RIWAYAT ERUPSI & LETUSAN TERKINI (MAGMA ESDM)
+-- Penjelasan: Laporan letusan gunung api real-time dengan tinggi kolom abu,
+-- arah sebaran material vulkanik, dan data seismik.
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS erupsi_terkini (
+    id SERIAL PRIMARY KEY,
+    gunung_nama VARCHAR(100) NOT NULL,
+    waktu_erupsi VARCHAR(100) NOT NULL,
+    tinggi_kolom_abu VARCHAR(100),
+    arah_abu VARCHAR(100),
+    amplitudo_durasi VARCHAR(100),
+    deskripsi TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_erupsi_created ON erupsi_terkini (id DESC);
 
 -- ====================================================================
 -- TABEL 5: PENGGUNA (Otentikasi & Autorisasi JWT)

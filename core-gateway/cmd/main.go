@@ -48,6 +48,7 @@ func main() {
 	cuacaH := handler.NewCuacaHandler(database)
 	wilayahH := handler.NewWilayahHandler(database)
 	authH := handler.NewAuthHandler(database, cfg)
+	gunungH := handler.NewGunungHandler(database)
 
 	// 4. Inisialisasi HTTP Router menggunakan ServeMux modern (Go 1.22+)
 	// Fitur baru Go 1.22+ mendukung method matching (GET/POST) dan parameter {id}
@@ -92,6 +93,12 @@ func main() {
 	mux.HandleFunc("GET /api/v1/cuaca/{id}", cuacaH.GetCuacaDetail)
 	mux.HandleFunc("GET /api/v1/kualitas-udara", cuacaH.GetKualitasUdara)
 
+	// -------------------------------------------------------------------------
+	// RUTE 3B: PEMANTAUAN GUNUNG API & ERUPSI TERKINI (PVMBG / MAGMA ESDM)
+	// -------------------------------------------------------------------------
+	mux.HandleFunc("GET /api/v1/gunung-api", gunungH.GetGunungList)
+	mux.HandleFunc("GET /api/v1/gunung-api/erupsi", gunungH.GetErupsiList)
+	mux.HandleFunc("GET /api/v1/gunung-api/summary", gunungH.GetGunungSummary)
 
 	// -------------------------------------------------------------------------
 	// RUTE 4: DATA MASTER WILAYAH (Publik)

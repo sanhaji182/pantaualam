@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { 
   Layers, Activity, MapPin, Eye, Radio, Info, Search, 
-  Filter, Moon, Sun, Mountain, Volume2, Sparkles, Navigation, Globe 
+  Filter, Moon, Sun, Mountain, Volume2, Sparkles, Navigation, Globe, Flame 
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
@@ -16,7 +16,13 @@ import { playSound } from '../utils/audio';
  * filter magnitudo, pencarian wilayah, dan auto-flyTo kamera dengan popup aktif.
  * =============================================================================
  */
-export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuakes = [] }) {
+export default function EarthquakeMap({ 
+  latestQuake, 
+  recentQuakes = [], 
+  feltQuakes = [], 
+  volcanoes = [], 
+  focusedVolcano = null 
+}) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const tileLayerRef = useRef(null);
@@ -24,6 +30,7 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
 
   const [mapStyle, setMapStyle] = useState('VOYAGER'); // 'VOYAGER', 'DARK', 'TOPO', 'SATELLITE'
   const [activeLayer, setActiveLayer] = useState('ALL'); // 'ALL', 'M5', 'DIRASAKAN'
+  const [showVolcanoLayer, setShowVolcanoLayer] = useState(true); // Toggle layer gunung api PVMBG
   const [magFilter, setMagFilter] = useState('ALL'); // 'ALL', 'M4', 'M5', 'M6'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedQuakeFocus, setSelectedQuakeFocus] = useState(null);
@@ -207,7 +214,88 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
       }
     }
 
-  }, [latestQuake, recentQuakes, feltQuakes, activeLayer]);
+    // 4. Plot Titik Gunung Api Aktif (PVMBG / MAGMA ESDM)
+    if (showVolcanoLayer && volcanoes && volcanoes.length > 0) {
+      volcanoes.forEach((v) => {
+        const lat = parseFloat(v.latitude);
+        const lon = parseFloat(v.longitude);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          const lvl = parseInt(v.level_angka, 10) || 1;
+          const color = lvl === 4 ? '#dc2626' : lvl === 3 ? '#ea580c' : lvl === 2 ? '#d97706' : '#059669';
+          const bgLight = lvl === 4 ? '#fef2f2' : lvl === 3 ? '#fff7ed' : lvl === 2 ? '#fffbeb' : '#ecfdf5';
+          const border = lvl === 4 ? '#ef4444' : lvl === 3 ? '#f97316' : lvl === 2 ? '#f59e0b' : '#10b981';
+
+          // Custom DivIcon marker dengan emoji gunung & indikator denyut
+          const iconHtml = `
+            <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+              <div style="position: absolute; inset: 0; border-radius: 50%; background: ${color}; opacity: ${lvl >= 3 ? 0.4 : 0.18}; ${lvl >= 3 ? 'animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;' : ''}"></div>
+              <div style="position: relative; width: 24px; height: 24px; border-radius: 50%; background: ${color}; border: 2px solid #ffffff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                🌋
+              </div>
+            </div>
+          `;
+
+          const customIcon = window.L.divIcon({
+            className: 'custom-volcano-marker',
+            html: iconHtml,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14],
+          });
+
+          const vMarker = window.L.marker([lat, lon], { icon: customIcon }).addTo(map);
+
+          const popupHtml = `
+            <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; padding: 4px; min-width: 210px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                <span style="background: ${color}; color: #ffffff; padding: 2px 7px; border-radius: 4px; font-weight: bold; font-size: 9px; text-transform: uppercase;">
+                  ${v.level_aktivitas || 'LEVEL ' + lvl}
+                </span>
+                <span style="font-size: 11px; font-weight: bold; color: #475569; background: #f1f5f9; padding: 1px 5px; border-radius: 4px;">
+                  ${v.tinggi_meter ? v.tinggi_meter + ' mdpl' : 'Aktif'}
+                </span>
+              </div>
+              <strong style="color: #0f172a; font-size: 14px; display: block;">Gunung ${v.nama}</strong>
+              <div style="color: #64748b; font-size: 11px; margin-top: 2px;">📍 ${v.provinsi}</div>
+              <div style="margin-top: 6px; padding: 6px; background: ${bgLight}; border: 1px solid ${border}40; border-radius: 6px; font-size: 11px; color: #334155;">
+                <strong style="color: ${color}; font-size: 10px; text-transform: uppercase;">Rekomendasi PVMBG:</strong><br>
+                ${v.rekomendasi || 'Tetap waspada dan patuhi batas jarak aman kawah aktif.'}
+              </div>
+              <div style="margin-top: 5px; font-size: 10px; color: #94a3b8;">
+                Koordinat: ${lat.toFixed(2)}°, ${lon.toFixed(2)}°
+              </div>
+            </div>
+          `;
+          vMarker.bindPopup(popupHtml);
+
+          const key = `VOLCANO_${v.id || v.nama}`;
+          markersRef.current[key] = vMarker;
+        }
+      });
+    }
+
+  }, [latestQuake, recentQuakes, feltQuakes, activeLayer, showVolcanoLayer, volcanoes]);
+
+  // Efek flyTo kamera saat gunung api dipilih dari section atau kartu
+  useEffect(() => {
+    if (!focusedVolcano || !mapInstanceRef.current || !window.L) return;
+    const lat = parseFloat(focusedVolcano.latitude);
+    const lon = parseFloat(focusedVolcano.longitude);
+    if (!isNaN(lat) && !isNaN(lon)) {
+      mapInstanceRef.current.flyTo([lat, lon], 9, {
+        duration: 1.2,
+        easeLinearity: 0.25
+      });
+
+      const key = `VOLCANO_${focusedVolcano.id || focusedVolcano.nama}`;
+      const marker = markersRef.current[key];
+      if (marker) {
+        setTimeout(() => {
+          marker.openPopup();
+        }, 1250);
+      }
+    }
+  }, [focusedVolcano]);
 
   // Efek ganti basemap style (VOYAGER / DARK / TOPO)
   useEffect(() => {
@@ -367,6 +455,21 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
               <span className="w-2 h-2 rounded-full bg-purple-600"></span>
               Dirasakan ({feltQuakes.length})
             </button>
+
+            {volcanoes && volcanoes.length > 0 && (
+              <button
+                onClick={() => { setShowVolcanoLayer(!showVolcanoLayer); playSound('click'); }}
+                className={`px-3 py-1 rounded-xl transition-all flex items-center gap-1.5 ${
+                  showVolcanoLayer
+                    ? 'bg-orange-500 text-white shadow-xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="Tampilkan / Sembunyikan titik Gunung Api aktif PVMBG"
+              >
+                <Flame className="w-3.5 h-3.5" />
+                <span>Gunung Api ({volcanoes.length})</span>
+              </button>
+            )}
           </div>
 
         </div>
@@ -384,7 +487,7 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
 
           {/* Legenda Peta Terapung di Pojok Kiri Bawah */}
           <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2.5 rounded-2xl border border-slate-200/90 shadow-lg text-[11px] font-semibold text-slate-700 space-y-1.5 max-w-xs">
-            <span className="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">Legenda Seismik</span>
+            <span className="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">Legenda Seismik &amp; Vulkanik</span>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-red-600 border border-white shadow-xs"></span>
               <span>Episentrum Utama Terkini</span>
@@ -395,8 +498,14 @@ export default function EarthquakeMap({ latestQuake, recentQuakes = [], feltQuak
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-purple-600 border border-white shadow-xs"></span>
-              <span>Gempa Dirasakan Warga (Skala MMI)</span>
+              <span>Dirasakan oleh Warga</span>
             </div>
+            {showVolcanoLayer && (
+              <div className="flex items-center gap-2 pt-1 border-t border-slate-200/60 text-orange-950 font-bold">
+                <span className="text-[12px]">🌋</span>
+                <span>Gunung Api Aktif PVMBG</span>
+              </div>
+            )}
           </div>
 
           {/* Badge Mode Aktif di Pojok Kanan Atas */}

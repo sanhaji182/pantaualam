@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Activity, Wind, AlertTriangle, ShieldCheck, 
-  Radio, Clock, MapPin, TrendingUp 
+  Radio, Clock, MapPin, TrendingUp, Flame, Mountain 
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
@@ -10,8 +10,8 @@ import { playSound } from '../utils/audio';
  * KOMPONEN: COMMAND CENTER BAR (Ringkasan KPI Bencana & Iklim Nasional)
  * File: src/components/CommandCenterBar.jsx
  * Deskripsi:
- * Memberikan ringkasan eksekutif 4 pilar utama BMKG dalam bentuk kartu metrik
- * real-time: Aktivitas Seismik, Kualitas Udara, Peringatan Ekstrem, dan Status Sensor.
+ * Memberikan ringkasan eksekutif 5 pilar utama BMKG & PVMBG:
+ * Seismik, Vulkanologi (Gunung Api), Kualitas Udara, Peringatan Cuaca, dan Sistem.
  * =============================================================================
  */
 export default function CommandCenterBar({ 
@@ -19,7 +19,8 @@ export default function CommandCenterBar({
   feltQuakes = [], 
   airQualityData = [], 
   weatherAlerts = [],
-  weatherList = []
+  weatherList = [],
+  volcanoSummary = null
 }) {
   // Hitung agregat PM2.5
   const totalSPKU = airQualityData.length;
@@ -36,7 +37,7 @@ export default function CommandCenterBar({
     !latestQuake.potensi.toLowerCase().includes('tidak');
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
       
       {/* 1. KARTU STATUS SEISMIK / GEMPA */}
       <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-red-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
@@ -77,7 +78,39 @@ export default function CommandCenterBar({
         </div>
       </div>
 
-      {/* 2. KARTU KUALITAS UDARA (PM2.5) */}
+      {/* 2. KARTU PEMANTAUAN GUNUNG API (PVMBG) */}
+      <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-orange-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+            <Flame className="w-3.5 h-3.5 text-orange-500" />
+            Vulkanologi PVMBG
+          </span>
+          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 border border-orange-200 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+            {(volcanoSummary?.total_gunung || 68)} GUNUNG
+          </span>
+        </div>
+
+        <div className="mt-3 flex items-baseline gap-2">
+          <span className="text-3xl font-black text-slate-900 tracking-tight">
+            {(volcanoSummary?.level_iv_awas || 0) + (volcanoSummary?.level_iii_siaga || 5)}
+          </span>
+          <span className="text-xs font-semibold text-orange-600">
+            Gunung Siaga &bull; Level III
+          </span>
+        </div>
+
+        <div className="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span>Waspada: <strong>{volcanoSummary?.level_ii_waspada || 21}</strong></span>
+          <span className="text-rose-600 font-semibold flex items-center gap-1">
+            <Flame className="w-3 h-3 text-rose-500" />
+            {volcanoSummary?.total_erupsi_aktif || 11} Laporan Erupsi
+          </span>
+        </div>
+      </div>
+
+      {/* 3. KARTU KUALITAS UDARA (PM2.5) */}
       <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-cyan-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
         <div className="flex items-center justify-between">

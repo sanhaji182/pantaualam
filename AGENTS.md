@@ -98,7 +98,8 @@ Bagi semua agent dan developer yang berkontribusi pada repositori ini:
 | **Prakiraan Cuaca Per Kecamatan** | `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4={kode}` | JSON | Tiap jam / hari |
 | **Peringatan Dini Cuaca Ekstrem** | `https://www.bmkg.go.id/alerts/nowcast/id` | XML (CAP RSS) | Real-time |
 | **Kualitas Udara Partikulat PM2.5** | `https://www.bmkg.go.id/kualitas-udara/informasi-partikulat-pm25.bmkg` | HTML (Nuxt State) | Tiap jam (SPKU) |
-
+| **Status Tingkat Aktivitas Gunung Api** | `https://magma.esdm.go.id/v1/gunung-api/tingkat-aktivitas` | HTML (Table PVMBG) | Real-time |
+| **Informasi Letusan & Erupsi Terkini** | `https://magma.esdm.go.id/v1/gunung-api/informasi-letusan` | HTML (Buletin Letusan) | Real-time |
 
 ---
 

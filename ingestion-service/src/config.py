@@ -50,6 +50,10 @@ class Config:
     # Endpoint informasi kualitas udara partikulat PM2.5 dari Stasiun Pemantau BMKG
     BMKG_AIR_QUALITY_URL = "https://www.bmkg.go.id/kualitas-udara/informasi-partikulat-pm25.bmkg"
 
+    # Endpoint pemantauan gunung api resmi PVMBG / MAGMA ESDM Indonesia
+    MAGMA_VOLCANO_STATUS_URL = "https://magma.esdm.go.id/v1/gunung-api/tingkat-aktivitas"
+    MAGMA_VOLCANO_ERUPTION_URL = "https://magma.esdm.go.id/v1/gunung-api/informasi-letusan"
+
     # -------------------------------------------------------------------------
     # 3. Parameter Operasional Worker
     # -------------------------------------------------------------------------
