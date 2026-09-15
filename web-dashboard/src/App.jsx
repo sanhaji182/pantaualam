@@ -48,6 +48,8 @@ export default function App() {
   const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [lastSyncTime, setLastSyncTime] = useState(new Date());
 
   // Fungsi memuat seluruh data dari Core API Gateway Golang
   const loadDashboardData = async () => {
@@ -67,6 +69,7 @@ export default function App() {
       setWeatherAlerts(alerts);
       setWeatherList(weather);
       setAirQualityList(air);
+      setLastSyncTime(new Date());
     } catch (error) {
       console.error('Kesalahan saat memuat data dashboard:', error);
     } finally {
@@ -75,14 +78,27 @@ export default function App() {
     }
   };
 
-  // Panggil data saat komponen pertama kali dimuat (Mounting)
+  // Panggil data saat komponen pertama kali dimuat & polling otomatis tiap 60 detik
   useEffect(() => {
     loadDashboardData();
+
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          loadDashboardData();
+          return 60;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Handler tombol segarkan manual
   const handleManualRefresh = () => {
     setRefreshing(true);
+    setCountdown(60);
     loadDashboardData();
   };
 
@@ -130,14 +146,26 @@ export default function App() {
             </div>
           </div>
 
-          <button
-            onClick={handleManualRefresh}
-            disabled={refreshing}
-            className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs hover:shadow-sm transition-all"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshing ? 'Menyinkronkan...' : 'Segarkan Data BMKG'}</span>
-          </button>
+          <div className="flex items-center gap-3 self-start sm:self-auto">
+            <div className="hidden sm:flex flex-col items-end text-[11px] font-mono text-slate-500">
+              <span className="flex items-center gap-1 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Auto-sync: <strong className="text-slate-800">{countdown}s</strong></span>
+              </span>
+              <span className="text-[10px] text-slate-400">
+                Update: {lastSyncTime.toLocaleTimeString('id-ID')}
+              </span>
+            </div>
+
+            <button
+              onClick={handleManualRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs hover:shadow-sm transition-all"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>{refreshing ? 'Menyinkronkan...' : 'Segarkan Data'}</span>
+            </button>
+          </div>
         </div>
 
         {/* 3. Ticker Peringatan Dini Cuaca Ekstrem (BMKG Nowcast CAP) */}
