@@ -148,7 +148,7 @@ def main():
     - Jika argumen '--once' diberikan, jalankan 1 kali lalu exit (cocok untuk cron job/test).
     - Jika tanpa argumen, jalankan sebagai background service yang tidur per interval waktu.
     """
-    logger.info("Service Ingestion BMKG NusantaraWeather Berhasil Dimulai!")
+    logger.info("Service Ingestion Data PantauAlam Berhasil Dimulai!")
     logger.info(f"Interval penarikan data: {Config.SYNC_INTERVAL_SECONDS} detik.")
 
     is_once = "--once" in sys.argv

@@ -77,16 +77,16 @@ export default function Navbar({ onOpenArchitecture }) {
           
           {/* 1. Logo & Brand Title */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
               <CloudLightning className="w-5 h-5" />
             </div>
             <div className="flex items-center gap-2.5">
               <span className="font-black text-lg text-slate-900 tracking-tight">
-                Nusantara<span className="text-blue-600">Weather</span>
+                Pantau<span className="text-emerald-600">Alam</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                BMKG LIVE
+                BMKG &bull; PVMBG
               </span>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function Navbar({ onOpenArchitecture }) {
             <button
               onClick={onOpenArchitecture}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-xs"
-              title="Spesifikasi Arsitektur & Rekayasa Sistem NusantaraWeather"
+              title="Spesifikasi Arsitektur & Rekayasa Sistem PantauAlam"
             >
               <Info className="w-3.5 h-3.5 text-cyan-400" />
               <span className="hidden sm:inline">Arsitektur</span>

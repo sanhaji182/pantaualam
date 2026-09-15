@@ -1,4 +1,4 @@
-# NusantaraWeather — Portal Monitoring Cuaca, Gempa & Bencana BMKG
+# PantauAlam — Portal Monitoring Cuaca, Gempa & Bencana Geologi
 > **Sistem Monitoring Cuaca, Bencana & Geofisika Skala Produksi (Enterprise-Grade)**  
 > Basis Kode: Monorepo Microservices (Python Ingestion + PostgreSQL Multi-Model + Golang Gateway + React JS + React Native + Docker & Linux Security)
 
@@ -13,7 +13,7 @@
 ---
 
 ## 1. TENTANG PROYEK
-**NusantaraWeather** adalah sistem monitoring cuaca, kegempaan, aktivitas gunung api, dan peringatan dini bencana nasional yang mengolah data real-time dari API Terbuka Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) serta Pusat Vulkanologi dan Mitigasi Bencana Geologi (PVMBG / MAGMA Indonesia).
+**PantauAlam** adalah sistem monitoring cuaca, kegempaan, aktivitas gunung api, dan peringatan dini bencana nasional yang mengolah data real-time dari API Terbuka Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) serta Pusat Vulkanologi dan Mitigasi Bencana Geologi (PVMBG / MAGMA Indonesia).
 
 Sistem ini dirancang dengan prinsip **Zero-Maintenance**, di mana data cuaca per jam, gempa bumi tektonik, kualitas udara PM2.5, status 68+ gunung api aktif, serta buletin letusan/erupsi ditarik, dibersihkan, dan disajikan secara otomatis 24/7 tanpa membutuhkan operasional manual harian.
 
@@ -48,7 +48,7 @@ Sistem ini dirancang dengan prinsip **Zero-Maintenance**, di mana data cuaca per
 ---
 
 ## 3. SPESIFIKASI MODUL & KOMPONEN TEKNOLOGI SISTEM
-Sistem NusantaraWeather dibangun dengan arsitektur microservices modular berstandar industri:
+Sistem PantauAlam dibangun dengan arsitektur microservices modular berstandar industri:
 
 | Komponen Layer | Teknologi / Pendekatan | Deskripsi Implementasi Produksi |
 | :--- | :--- | :--- |
@@ -165,7 +165,7 @@ npx expo start
 ## 7. ORCHESTRATOR & LISENSI OPEN SOURCE
 
 - **System Orchestrator:** Sistem ini dirancang, dibangun, dan diorchestrasi secara menyeluruh oleh **Sanhaji**.
-- **Filosofi Open Source:** NusantaraWeather adalah proyek **100% Full Open Source**. Siapapun dipersilakan untuk menggunakan, mengembangkan, memodifikasi, serta memanfaatkan sistem ini untuk keperluan riset iklim, mitigasi bencana, edukasi, sistem peringatan dini, maupun implementasi komersial.
+- **Filosofi Open Source:** PantauAlam adalah proyek **100% Full Open Source**. Siapapun dipersilakan untuk menggunakan, mengembangkan, memodifikasi, serta memanfaatkan sistem ini untuk keperluan riset iklim, mitigasi bencana, edukasi, sistem peringatan dini, maupun implementasi komersial.
 - **Lisensi:** Berada di bawah naungan [MIT License](LICENSE). Bebas dan terbuka tanpa batasan.
 - **Data Source:** Seluruh data cuaca, kegempaan, dan kualitas udara merupakan data resmi publik dari **Badan Meteorologi, Klimatologi, dan Geofisika (BMKG) Republik Indonesia**.
 

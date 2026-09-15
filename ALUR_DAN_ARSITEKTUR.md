@@ -1,5 +1,5 @@
 # ALUR KERJA DAN ARSITEKTUR SISTEM
-## NUSANTARA WEATHER & DISASTER MONITOR
+## PANTAUALAM — DISASTER & CLIMATE MONITOR
 
 Dokumen ini menjelaskan secara rinci bagaimana seluruh bagian aplikasi bekerja sama, mulai dari pengambilan data mentah dari satelit BMKG, penyimpanan di database PostgreSQL, pemrosesan di backend Golang, hingga disajikan ke pengguna di Web dan Mobile.
 

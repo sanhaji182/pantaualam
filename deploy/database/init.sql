@@ -1,5 +1,5 @@
 -- ====================================================================
--- INISIALISASI DATABASE NUSANTARA WEATHER & DISASTER MONITOR
+-- INISIALISASI DATABASE PANTAUALAM DISASTER & CLIMATE MONITOR
 -- Database: PostgreSQL 16
 -- Karakteristik: Hybrid Multi-Model (Relational Tables + NoSQL JSONB)
 -- ====================================================================
@@ -259,5 +259,5 @@ ON CONFLICT (id) DO NOTHING;
 
 -- 3. Akun Pengguna Contoh (Password: "Rahasia123!" yang sudah di-hash dengan bcrypt)
 INSERT INTO users (id, nama_lengkap, email, password_hash, role) VALUES
-('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Admin BMKG Monitor', 'admin@nusantaraweather.id', '$2a$10$7Z8VfXw8vS0QoW9oR8jSmeE0D.e1tHjD2NlVwU2XpG1q9k9vR1bWe', 'ADMIN')
+('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'Admin BMKG Monitor', 'admin@pantaualam.id', '$2a$10$7Z8VfXw8vS0QoW9oR8jSmeE0D.e1tHjD2NlVwU2XpG1q9k9vR1bWe', 'ADMIN')
 ON CONFLICT (email) DO NOTHING;

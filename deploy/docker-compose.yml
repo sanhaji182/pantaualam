@@ -1,5 +1,5 @@
 # =============================================================================
-# DOCKER COMPOSE: NUSANTARA WEATHER & DISASTER MONITOR
+# DOCKER COMPOSE: PANTAUALAM DISASTER & CLIMATE MONITOR
 # Orkestrasi Multi-Container (PostgreSQL, Python Ingestion, Golang Gateway, React Web)
 # Cara Menjalankan: docker compose up --build -d
 # =============================================================================

@@ -1,6 +1,6 @@
-# AGENTS.MD — NUSANTARA WEATHER & DISASTER MONITOR
+# AGENTS.MD — PANTAUALAM DISASTER & CLIMATE MONITOR
 > **Panduan & Standar Operasional untuk Developer & AI Coding Assistant**  
-> Proyek: **NusantaraWeather** (Portal Cuaca, Gempa & Peringatan Bencana BMKG)  
+> Proyek: **PantauAlam** (Portal Cuaca, Gempa & Peringatan Bencana BMKG & PVMBG)  
 > Status: **Enterprise-Grade Production Ready**  
 > Orchestrator: **Sanhaji** (System Orchestrator)  
 > Lisensi: **MIT License (Full Open Source)**  

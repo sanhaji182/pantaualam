@@ -17,7 +17,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Palet warna khusus identitas NusantaraWeather
+        // Palet warna khusus identitas PantauAlam
         bmkg: {
           blue: "#0A3981",  // Biru laut BMKG
           light: "#E38E49", // Oranye peringatan

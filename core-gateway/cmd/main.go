@@ -29,7 +29,7 @@ import (
 
 func main() {
 	log.Println("==========================================================")
-	log.Println("MEMULAI NUSANTARA WEATHER & DISASTER MONITOR API GATEWAY")
+	log.Println("MEMULAI PANTAUALAM DISASTER & CLIMATE MONITOR API GATEWAY")
 	log.Println("Production Environment: High-Performance Distributed Gateway")
 	log.Println("==========================================================")
 
@@ -60,7 +60,7 @@ func main() {
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"service":      "NusantaraWeather Core Gateway",
+			"service":      "PantauAlam Core Gateway",
 			"status":       "ONLINE",
 			"version":      "1.0.0",
 			"orchestrator": "Sanhaji",

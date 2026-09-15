@@ -1,6 +1,6 @@
 /**
  * =============================================================================
- * APLIKASI MOBILE: NUSANTARA WEATHER (React Native Expo)
+ * APLIKASI MOBILE: PANTAUALAM (React Native Expo)
  * File: mobile-app/App.js
  * Kesesuaian Silabus: Modul 11 — React Native
  * 
@@ -102,7 +102,7 @@ export default function App() {
       {/* HEADER NAVIGASI APLIKASI */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>NusantaraWeather</Text>
+          <Text style={styles.headerTitle}>PantauAlam</Text>
           <Text style={styles.headerSubtitle}>Portal Lengkap Sensor BMKG</Text>
         </View>
         <View style={styles.badgeLive}>
@@ -340,7 +340,7 @@ export default function App() {
 
             {/* Footer Orchestrator & Open Source */}
             <View style={styles.appFooterCard}>
-              <Text style={styles.appFooterTitle}>NusantaraWeather</Text>
+              <Text style={styles.appFooterTitle}>PantauAlam</Text>
               <Text style={styles.appFooterOrchestrator}>Diorchestrasi oleh Sanhaji (System Orchestrator)</Text>
               <Text style={styles.appFooterDesc}>
                 100% Full Open Source (Lisensi MIT) &bull; Bebas digunakan dan dikembangkan oleh siapapun untuk mitigasi bencana dan iklim.

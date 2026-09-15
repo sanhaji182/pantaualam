@@ -34,7 +34,7 @@ import { playSound } from './utils/audio';
  * KOMPONEN UTAMA: APP (React JS)
  * File: src/App.jsx
  * Deskripsi:
- * Dashboard pusat kendali bencana dan iklim nasional NusantaraWeather.
+ * Dashboard pusat kendali bencana dan iklim nasional PantauAlam.
  * Mengintegrasikan seluruh sensor BMKG:
  * 1. Peringatan Dini Cuaca Ekstrem (CAP RSS Nowcast)
  * 2. Command Center KPI Bar (4 Pilar Iklim & Seismik)
@@ -154,13 +154,13 @@ export default function App() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs shadow-blue-500/50"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/50"></span>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                  Pusat Kendali Bencana &amp; Iklim Nasional
+                  PantauAlam &bull; Pusat Kendali Bencana &amp; Iklim
                 </h1>
               </div>
               <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-                Data real-time BMKG Indonesia &bull; Diorchestrasi oleh <strong className="text-slate-800 font-bold">Sanhaji</strong> &bull; Lisensi MIT (Full Open Source)
+                Data real-time BMKG &amp; PVMBG Indonesia &bull; Diorchestrasi oleh <strong className="text-slate-800 font-bold">Sanhaji</strong> &bull; Lisensi MIT (Full Open Source)
               </p>
             </div>
           </div>
@@ -540,7 +540,7 @@ export default function App() {
             <div>
               <div className="flex items-center gap-2">
                 <h4 className="font-extrabold text-base text-slate-900 tracking-tight">
-                  Nusantara<span className="text-blue-600">Weather</span> &mdash; Portal Iklim &amp; Bencana Nasional
+                  Pantau<span className="text-emerald-600">Alam</span> &mdash; Portal Iklim &amp; Bencana Nasional
                 </h4>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
                   FULL OPEN SOURCE
@@ -597,8 +597,8 @@ export default function App() {
           </div>
 
           <div className="border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
-            <p>&copy; 2026 NusantaraWeather. Data resmi terbuka dari BMKG Indonesia.</p>
-            <p className="font-medium text-slate-500">NusantaraWeather Enterprise Edition v1.0.0 &bull; Open Source by Sanhaji</p>
+            <p>&copy; 2026 PantauAlam. Data resmi terbuka dari BMKG &amp; PVMBG Indonesia.</p>
+            <p className="font-medium text-slate-500">PantauAlam Enterprise Edition v1.0.0 &bull; Open Source by Sanhaji</p>
           </div>
         </div>
       </footer>

@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # SKRIP OTOMASI PENGUATAN KEAMANAN SERVER LINUX UBUNTU (SERVER HARDENING)
-# Proyek: NusantaraWeather & Disaster Monitor
+# Proyek: PantauAlam — Disaster & Climate Monitor
 # Keamanan: Server Hardening, Firewall UFW, Fail2ban & Audit Keamanan
 # Target OS: Ubuntu Server 22.04 / 24.04 LTS
 # =============================================================================
