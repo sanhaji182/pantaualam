@@ -125,71 +125,29 @@ export default function App() {
       {/* 2. Area Konten Utama */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-7">
         
-        {/* Baris Tombol Refresh & Keterangan Waktu */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                Pusat Kendali Bencana &amp; Iklim Nasional
-              </h2>
+        {/* Header Judul Halaman & Status */}
+        <div className="pt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-xs shadow-blue-500/50"></span>
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  Pusat Kendali Bencana &amp; Iklim Nasional
+                </h1>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+                Data real-time BMKG Indonesia &bull; Diorchestrasi oleh <strong className="text-slate-800 font-bold">Sanhaji</strong> &bull; Lisensi MIT (Full Open Source)
+              </p>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Data terintegrasi 100% dari jaringan sensor satelit, seismograf &amp; SPKU BMKG Indonesia secara otomatis.
-            </p>
-            <div className="flex flex-wrap items-center gap-2 mt-2.5">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                <Code2 className="w-3 h-3 text-blue-600" />
-                Orchestrated by Sanhaji
-              </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <GitBranch className="w-3 h-3 text-emerald-600" />
-                100% Full Open Source (MIT)
-              </span>
-              <span className="text-[11px] text-slate-400 hidden sm:inline">
-                &bull; Bebas digunakan &amp; dikembangkan oleh siapapun
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 self-start sm:self-auto">
-            <div className="hidden sm:flex flex-col items-end text-[11px] font-mono text-slate-500">
-              <span className="flex items-center gap-1 font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Auto-sync: <strong className="text-slate-800">{countdown}s</strong></span>
-              </span>
-              <span className="text-[10px] text-slate-400">
-                Update: {lastSyncTime.toLocaleTimeString('id-ID')}
-              </span>
-            </div>
-
-            <button
-              onClick={handleManualRefresh}
-              disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-xs hover:shadow-sm transition-all"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>{refreshing ? 'Menyinkronkan...' : 'Segarkan Data'}</span>
-            </button>
           </div>
         </div>
 
-        {/* 3. Ticker Peringatan Dini Cuaca Ekstrem (BMKG Nowcast CAP) */}
-        <WeatherAlertBar alerts={weatherAlerts} />
-
-        {/* 4. Command Center Bar (4 Metrik Eksekutif) */}
-        <CommandCenterBar
-          latestQuake={latestQuake}
-          feltQuakes={feltQuakes}
-          airQualityData={airQualityList}
-          weatherAlerts={weatherAlerts}
-          weatherList={weatherList}
-        />
-
-        {/* 5. Sticky Navigation Hub & View Mode Switcher */}
+        {/* Sticky Control Bar: Navigation Hub & Auto-Sync Controls */}
         <div className="sticky top-16 z-30 bg-slate-100/95 backdrop-blur-md py-2.5 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 border-y border-slate-200/80 shadow-xs transition-all">
           <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 p-1 bg-white/90 border border-slate-200 rounded-2xl shadow-xs overflow-x-auto no-scrollbar">
+            
+            {/* View Mode Switcher */}
+            <div className="flex items-center gap-1.5 p-1 bg-white/95 border border-slate-200 rounded-2xl shadow-xs overflow-x-auto no-scrollbar">
               <button
                 onClick={() => { setActiveSectionTab('ALL'); playSound('CLICK'); }}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 ${
@@ -210,7 +168,7 @@ export default function App() {
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                 }`}
               >
-                <Activity className="w-3.5 h-3.5 text-rose-400" />
+                <Activity className="w-3.5 h-3.5 text-rose-300" />
                 <span>Seismologi &amp; Gempa</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
                   activeSectionTab === 'SEISMIC' ? 'bg-rose-700 text-rose-100' : 'bg-slate-100 text-slate-500'
@@ -227,7 +185,7 @@ export default function App() {
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                 }`}
               >
-                <Wind className="w-3.5 h-3.5 text-emerald-400" />
+                <Wind className="w-3.5 h-3.5 text-emerald-300" />
                 <span>Kualitas Udara PM2.5</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
                   activeSectionTab === 'AIR' ? 'bg-emerald-700 text-emerald-100' : 'bg-slate-100 text-slate-500'
@@ -244,7 +202,7 @@ export default function App() {
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                 }`}
               >
-                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <Sun className="w-3.5 h-3.5 text-amber-300" />
                 <span>Prakiraan Cuaca Kota</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
                   activeSectionTab === 'WEATHER' ? 'bg-amber-700 text-amber-100' : 'bg-slate-100 text-slate-500'
@@ -254,18 +212,40 @@ export default function App() {
               </button>
             </div>
 
-            <div className="hidden lg:flex items-center gap-2 text-xs font-medium text-slate-500">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white rounded-xl border border-slate-200 shadow-xs font-mono text-[11px] text-slate-700">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Modul Terpilih: <strong>{
-                  activeSectionTab === 'ALL' ? 'Ikhtisar Komprehensif' :
-                  activeSectionTab === 'SEISMIC' ? 'Fokus Seismologi' :
-                  activeSectionTab === 'AIR' ? 'Fokus Kualitas Udara' : 'Fokus Cuaca Kota'
-                }</strong></span>
-              </span>
+            {/* Auto-Sync & Refresh Action Pill */}
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-xl border border-slate-200 text-xs font-mono text-slate-600 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Auto-sync: <strong className="text-slate-900 font-semibold">{countdown}s</strong></span>
+                <span className="text-slate-300">|</span>
+                <span className="text-[11px] text-slate-400">{lastSyncTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+
+              <button
+                onClick={handleManualRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 shadow-xs hover:shadow-sm transition-all disabled:opacity-70"
+                title="Sinkronkan data terbaru dari API BMKG"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${refreshing ? 'animate-spin' : ''}`} />
+                <span>{refreshing ? 'Sinkron...' : 'Segarkan'}</span>
+              </button>
             </div>
+
           </div>
         </div>
+
+        {/* Ticker Peringatan Dini Cuaca Ekstrem (BMKG Nowcast CAP) */}
+        <WeatherAlertBar alerts={weatherAlerts} />
+
+        {/* Command Center Bar (4 Metrik Eksekutif) */}
+        <CommandCenterBar
+          latestQuake={latestQuake}
+          feltQuakes={feltQuakes}
+          airQualityData={airQualityList}
+          weatherAlerts={weatherAlerts}
+          weatherList={weatherList}
+        />
 
         {/* 6. Pemilihan Wilayah & Hero Spotlight Pantauan Lokal (Hanya ditampilkan pada Semua Modul & Tab Cuaca) */}
         {(activeSectionTab === 'ALL' || activeSectionTab === 'WEATHER') && (
