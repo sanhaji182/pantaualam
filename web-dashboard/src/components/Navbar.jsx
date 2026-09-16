@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   CloudLightning, Clock, Info, ShieldCheck, Activity, 
-  Wind, CloudRain, Volume2, VolumeX, Radio, Zap, Sparkles 
+  Wind, CloudRain, Volume2, VolumeX, Radio, Zap, Sparkles, Github 
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
@@ -128,6 +128,18 @@ export default function Navbar({ onOpenArchitecture }) {
               <Info className="w-3.5 h-3.5 text-cyan-400" />
               <span className="hidden sm:inline">Arsitektur</span>
             </button>
+
+            {/* Tombol GitHub Repository */}
+            <a
+              href="https://github.com/sanhaji182/pantaualam"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80 transition-all shadow-xs hover:border-slate-300"
+              title="Akses Repositori GitHub PantauAlam (Full Open Source)"
+            >
+              <Github className="w-3.5 h-3.5 text-slate-900" />
+              <span className="hidden sm:inline">GitHub</span>
+            </a>
 
           </div>
 

@@ -25,7 +25,7 @@ import {
 import { 
   RefreshCw, X, ShieldCheck, Database, Server, Cpu, 
   Globe, Code2, GitBranch, Heart, LayoutDashboard, 
-  Activity, Wind, Sun, Layers, Flame 
+  Activity, Wind, Sun, Layers, Flame, Github, ExternalLink 
 } from 'lucide-react';
 import { playSound } from './utils/audio';
 
@@ -601,7 +601,18 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 text-xs shrink-0">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs shrink-0">
+              <a
+                href="https://github.com/sanhaji182/pantaualam"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold flex items-center gap-2 transition-all shadow-md hover:scale-105 active:scale-95"
+                title="Kunjungi Repositori GitHub PantauAlam"
+              >
+                <Github className="w-4 h-4 text-slate-900" />
+                <span>GitHub Repository</span>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+              </a>
               <span className="px-3 py-1.5 rounded-xl bg-white/10 text-white font-medium border border-white/10 flex items-center gap-1.5 backdrop-blur-xs">
                 <GitBranch className="w-3.5 h-3.5 text-emerald-400" /> MIT License
               </span>
@@ -613,7 +624,19 @@ export default function App() {
 
           <div className="border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
             <p>&copy; 2026 PantauAlam. Data resmi terbuka dari BMKG &amp; PVMBG Indonesia.</p>
-            <p className="font-medium text-slate-500">PantauAlam Enterprise Edition v1.0.0 &bull; Open Source by Sanhaji</p>
+            <p className="font-medium text-slate-500 flex items-center gap-1">
+              <span>PantauAlam Enterprise Edition v1.0.0 &bull;</span>
+              <a 
+                href="https://github.com/sanhaji182/pantaualam"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-700 hover:underline font-semibold inline-flex items-center gap-1"
+              >
+                Open Source on GitHub
+                <ExternalLink className="w-3 h-3" />
+              </a>
+              <span>by Sanhaji</span>
+            </p>
           </div>
         </div>
       </footer>

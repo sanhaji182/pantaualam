@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   X, Database, Server, Cpu, Shield, 
-  CheckCircle2, Layers, Terminal, BookOpen, ExternalLink 
+  CheckCircle2, Layers, Terminal, BookOpen, ExternalLink, Github 
 } from 'lucide-react';
 
 /**
@@ -255,12 +255,25 @@ export default function ArchitectureModal({ isOpen, onClose }) {
               100% Full Open Source (MIT)
             </span>
           </div>
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold transition-colors w-full sm:w-auto"
-          >
-            Tutup
-          </button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <a
+              href="https://github.com/sanhaji182/pantaualam"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+              title="Akses Source Code di GitHub"
+            >
+              <Github className="w-3.5 h-3.5" />
+              <span>GitHub Repo</span>
+              <ExternalLink className="w-3 h-3 text-blue-200" />
+            </a>
+            <button
+              onClick={onClose}
+              className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-semibold transition-colors flex-1 sm:flex-initial"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
 
       </div>
