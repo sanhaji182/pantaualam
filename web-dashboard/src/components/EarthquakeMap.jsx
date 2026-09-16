@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
+import L from 'leaflet';
 import { 
   Layers, Activity, MapPin, Eye, Radio, Info, Search, 
   Filter, Moon, Sun, Mountain, Volume2, Sparkles, Navigation, Globe, Flame, Wind 
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
-import { getCategoryBadge } from './AirQualitySection';
+import { getCategoryBadge } from '../utils/airQuality';
 
 /**
  * =============================================================================
@@ -72,10 +73,14 @@ export default function EarthquakeMap({
 
   // 1. Inisialisasi Peta Leaflet & Tile Layer
   useEffect(() => {
-    if (!window.L || !mapContainerRef.current) return;
+    if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
-      const map = window.L.map(mapContainerRef.current, {
+      if (mapContainerRef.current._leaflet_id) {
+        mapContainerRef.current._leaflet_id = null;
+      }
+
+      const map = L.map(mapContainerRef.current, {
         center: [-2.5, 118.0],
         zoom: 5,
         minZoom: 3,
@@ -84,7 +89,7 @@ export default function EarthquakeMap({
       });
 
       const initialCfg = TILE_CONFIGS[mapStyle];
-      const initialLayer = window.L.tileLayer(initialCfg.url, {
+      const initialLayer = L.tileLayer(initialCfg.url, {
         attribution: initialCfg.attrib,
         subdomains: initialCfg.subdomains || 'abcd',
         maxZoom: initialCfg.maxZoom || 19
@@ -98,7 +103,7 @@ export default function EarthquakeMap({
 
     // Bersihkan marker lama
     map.eachLayer((layer) => {
-      if (layer instanceof window.L.CircleMarker || layer instanceof window.L.Marker) {
+      if (layer instanceof L.CircleMarker || layer instanceof L.Marker || layer instanceof L.Circle) {
         map.removeLayer(layer);
       }
     });
@@ -112,7 +117,7 @@ export default function EarthquakeMap({
         const mag = parseFloat(q.magnitude) || 4.0;
 
         if (!isNaN(lat) && !isNaN(lon)) {
-          const circle = window.L.circleMarker([lat, lon], {
+          const circle = L.circleMarker([lat, lon], {
             radius: Math.max(mag * 2.5, 7),
             fillColor: '#f97316',
             color: '#ffffff',
@@ -147,7 +152,7 @@ export default function EarthquakeMap({
         const mag = parseFloat(q.magnitude) || 3.5;
 
         if (!isNaN(lat) && !isNaN(lon)) {
-          const circle = window.L.circleMarker([lat, lon], {
+          const circle = L.circleMarker([lat, lon], {
             radius: Math.max(mag * 2.2, 6),
             fillColor: '#8b5cf6',
             color: '#ffffff',
@@ -175,14 +180,14 @@ export default function EarthquakeMap({
     }
 
     // 3. Plot Gempa Terkini Utama (Episentrum Berdenyut Merah)
-    if (latestQuake) {
+    if (latestQuake && activeLayer !== 'AIR') {
       const lat = parseFloat(latestQuake.latitude);
       const lon = parseFloat(latestQuake.longitude);
       if (!isNaN(lat) && !isNaN(lon)) {
         const mag = parseFloat(latestQuake.magnitude) || 5.0;
 
         // Radius Gelombang Seismik Luar
-        window.L.circleMarker([lat, lon], {
+        L.circleMarker([lat, lon], {
           radius: mag * 7,
           fillColor: '#ef4444',
           color: '#dc2626',
@@ -192,7 +197,7 @@ export default function EarthquakeMap({
         }).addTo(map);
 
         // Inti Episentrum
-        const mainMarker = window.L.circleMarker([lat, lon], {
+        const mainMarker = L.circleMarker([lat, lon], {
           radius: mag * 3.8,
           fillColor: '#b91c1c',
           color: '#ffffff',
@@ -217,7 +222,7 @@ export default function EarthquakeMap({
     }
 
     // 4. Plot Titik Gunung Api Aktif (PVMBG / MAGMA ESDM)
-    if (showVolcanoLayer && volcanoes && volcanoes.length > 0) {
+    if (showVolcanoLayer && volcanoes && volcanoes.length > 0 && activeLayer !== 'AIR') {
       volcanoes.forEach((v) => {
         const lat = parseFloat(v.latitude);
         const lon = parseFloat(v.longitude);
@@ -237,7 +242,7 @@ export default function EarthquakeMap({
             </div>
           `;
 
-          const customIcon = window.L.divIcon({
+          const customIcon = L.divIcon({
             className: 'custom-volcano-marker',
             html: iconHtml,
             iconSize: [28, 28],
@@ -245,7 +250,7 @@ export default function EarthquakeMap({
             popupAnchor: [0, -14],
           });
 
-          const vMarker = window.L.marker([lat, lon], { icon: customIcon }).addTo(map);
+          const vMarker = L.marker([lat, lon], { icon: customIcon }).addTo(map);
 
           const popupHtml = `
             <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; padding: 4px; min-width: 210px;">
@@ -277,7 +282,7 @@ export default function EarthquakeMap({
     }
 
     // 5. Plot Stasiun Kualitas Udara SPKU BMKG (Partikulat PM2.5)
-    if (showAirQualityLayer && airQualityData && airQualityData.length > 0) {
+    if ((showAirQualityLayer || activeLayer === 'AIR') && airQualityData && airQualityData.length > 0) {
       airQualityData.forEach((station) => {
         const lat = parseFloat(station.latitude);
         const lon = parseFloat(station.longitude);
@@ -319,7 +324,7 @@ export default function EarthquakeMap({
           const areaRadius = isHighPollution ? 65000 : 45000;
 
           // Lingkaran Dispersi Luar (Transparan)
-          window.L.circle([lat, lon], {
+          L.circle([lat, lon], {
             radius: areaRadius * 1.5,
             fillColor: color,
             fillOpacity: isHighPollution ? 0.15 : 0.08,
@@ -329,7 +334,7 @@ export default function EarthquakeMap({
           }).addTo(map);
 
           // Zonasi Utama Area Polusi Daerah
-          const areaZone = window.L.circle([lat, lon], {
+          const areaZone = L.circle([lat, lon], {
             radius: areaRadius,
             fillColor: color,
             fillOpacity: isHighPollution ? 0.38 : 0.25,
@@ -369,7 +374,7 @@ export default function EarthquakeMap({
             </div>
           `;
 
-          const airIcon = window.L.divIcon({
+          const airIcon = L.divIcon({
             className: 'custom-air-marker',
             html: iconHtml,
             iconSize: [60, 24],
@@ -377,7 +382,7 @@ export default function EarthquakeMap({
             popupAnchor: [0, -12],
           });
 
-          const airMarker = window.L.marker([lat, lon], { icon: airIcon }).addTo(map);
+          const airMarker = L.marker([lat, lon], { icon: airIcon }).addTo(map);
 
           const popupHtml = `
             <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4; padding: 4px; min-width: 220px;">
@@ -433,7 +438,7 @@ export default function EarthquakeMap({
 
   // Efek flyTo kamera saat stasiun kualitas udara dipilih dari section atau feed
   useEffect(() => {
-    if (!focusedAirStation || !mapInstanceRef.current || !window.L) return;
+    if (!focusedAirStation || !mapInstanceRef.current) return;
     const lat = parseFloat(focusedAirStation.latitude);
     const lon = parseFloat(focusedAirStation.longitude);
     if (!isNaN(lat) && !isNaN(lon)) {
@@ -457,7 +462,7 @@ export default function EarthquakeMap({
 
   // Efek flyTo kamera saat gunung api dipilih dari section atau kartu
   useEffect(() => {
-    if (!focusedVolcano || !mapInstanceRef.current || !window.L) return;
+    if (!focusedVolcano || !mapInstanceRef.current) return;
     const lat = parseFloat(focusedVolcano.latitude);
     const lon = parseFloat(focusedVolcano.longitude);
     if (!isNaN(lat) && !isNaN(lon)) {
@@ -478,7 +483,7 @@ export default function EarthquakeMap({
 
   // Efek ganti basemap style (VOYAGER / DARK / TOPO)
   useEffect(() => {
-    if (!mapInstanceRef.current || !window.L) return;
+    if (!mapInstanceRef.current) return;
     const map = mapInstanceRef.current;
 
     if (tileLayerRef.current) {
@@ -486,7 +491,7 @@ export default function EarthquakeMap({
     }
 
     const cfg = TILE_CONFIGS[mapStyle];
-    tileLayerRef.current = window.L.tileLayer(cfg.url, {
+    tileLayerRef.current = L.tileLayer(cfg.url, {
       attribution: cfg.attrib,
       subdomains: 'abcd',
       maxZoom: 19
@@ -679,6 +684,30 @@ export default function EarthquakeMap({
               Dirasakan ({feltQuakes.length})
             </button>
 
+            {/* Tombol Tab Khusus Mode Peta Kualitas Udara PM2.5 */}
+            {airQualityData && airQualityData.length > 0 && (
+              <button
+                onClick={() => { 
+                  setActiveLayer('AIR'); 
+                  setShowAirQualityLayer(true); 
+                  setFeedTab('AIR');
+                  playSound('click'); 
+                  if (mapInstanceRef.current) {
+                    mapInstanceRef.current.flyTo([-2.5, 118.0], 5, { duration: 1.2 });
+                  }
+                }}
+                className={`px-3 py-1 rounded-xl transition-all flex items-center gap-1.5 ${
+                  activeLayer === 'AIR'
+                    ? 'bg-emerald-600 text-white shadow-xs font-black ring-2 ring-emerald-400/40'
+                    : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200'
+                }`}
+                title="Fokuskan peta ke pemetaan zonasi area Kualitas Udara PM2.5 BMKG"
+              >
+                <Wind className="w-3.5 h-3.5" />
+                <span>Peta Udara PM2.5 ({airQualityData.length})</span>
+              </button>
+            )}
+
             {volcanoes && volcanoes.length > 0 && (
               <button
                 onClick={() => { setShowVolcanoLayer(!showVolcanoLayer); playSound('click'); }}
@@ -691,21 +720,6 @@ export default function EarthquakeMap({
               >
                 <Flame className="w-3.5 h-3.5" />
                 <span>Gunung Api ({volcanoes.length})</span>
-              </button>
-            )}
-
-            {airQualityData && airQualityData.length > 0 && (
-              <button
-                onClick={() => { setShowAirQualityLayer(!showAirQualityLayer); playSound('click'); }}
-                className={`px-3 py-1 rounded-xl transition-all flex items-center gap-1.5 ${
-                  showAirQualityLayer
-                    ? 'bg-emerald-600 text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
-                title="Tampilkan / Sembunyikan pemetaan Kualitas Udara SPKU BMKG"
-              >
-                <Wind className="w-3.5 h-3.5" />
-                <span>Udara PM2.5 ({airQualityData.length})</span>
               </button>
             )}
           </div>
@@ -721,6 +735,7 @@ export default function EarthquakeMap({
           <div 
             ref={mapContainerRef} 
             className="w-full h-[490px] rounded-2xl overflow-hidden border border-slate-200 shadow-inner z-10"
+            style={{ height: '490px', width: '100%' }}
           ></div>
 
           {/* Legenda Peta Terapung di Pojok Kiri Bawah */}

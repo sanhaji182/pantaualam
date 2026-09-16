@@ -11,6 +11,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import 'leaflet/dist/leaflet.css' // Memuat stylesheet Leaflet resmi secara lokal
 import './index.css' // Memuat utilitas Tailwind CSS dan styling Leaflet
 
 // Me-mount komponen root aplikasi React ke elemen DOM #root di index.html

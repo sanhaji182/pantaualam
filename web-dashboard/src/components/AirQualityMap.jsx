@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import L from 'leaflet';
 import { 
   Wind, MapPin, Layers, Sun, Moon, Mountain, Globe, 
   Search, ShieldAlert, Sparkles, Navigation, Info, ArrowUpRight, Compass
@@ -75,10 +76,14 @@ export default function AirQualityMap({
 
   // Inisialisasi peta Leaflet
   useEffect(() => {
-    if (!window.L || !mapContainerRef.current) return;
+    if (!mapContainerRef.current) return;
 
     if (!mapInstanceRef.current) {
-      const map = window.L.map(mapContainerRef.current, {
+      if (mapContainerRef.current._leaflet_id) {
+        mapContainerRef.current._leaflet_id = null;
+      }
+
+      const map = L.map(mapContainerRef.current, {
         center: [-2.5, 118.0],
         zoom: 5,
         minZoom: 4,
@@ -87,7 +92,7 @@ export default function AirQualityMap({
       });
 
       const initialCfg = TILE_CONFIGS[mapStyle];
-      const initialLayer = window.L.tileLayer(initialCfg.url, {
+      const initialLayer = L.tileLayer(initialCfg.url, {
         attribution: initialCfg.attrib,
         maxZoom: initialCfg.maxZoom || 19
       }).addTo(map);
@@ -100,7 +105,7 @@ export default function AirQualityMap({
 
     // Bersihkan objek lama di peta
     map.eachLayer((layer) => {
-      if (layer instanceof window.L.CircleMarker || layer instanceof window.L.Marker || layer instanceof window.L.Circle) {
+      if (layer instanceof L.CircleMarker || layer instanceof L.Marker || layer instanceof L.Circle) {
         map.removeLayer(layer);
       }
     });
@@ -169,7 +174,7 @@ export default function AirQualityMap({
         // 1. Pemetaan Lingkaran Area Cakupan Polusi (Zonasi Wilayah)
         if (showRadiusZones) {
           // Halo luar atmosfer transparan
-          window.L.circle([lat, lon], {
+          L.circle([lat, lon], {
             radius: areaRadius * 1.5,
             fillColor: color,
             fillOpacity: isAlert ? 0.14 : 0.07,
@@ -179,7 +184,7 @@ export default function AirQualityMap({
           }).addTo(map);
 
           // Zonasi Utama Area Polusi Daerah
-          const zoneArea = window.L.circle([lat, lon], {
+          const zoneArea = L.circle([lat, lon], {
             radius: areaRadius,
             fillColor: color,
             fillOpacity: isAlert ? 0.38 : 0.24,
@@ -225,7 +230,7 @@ export default function AirQualityMap({
           </div>
         `;
 
-        const customMarker = window.L.divIcon({
+        const customMarker = L.divIcon({
           className: 'custom-air-zone-marker',
           html: iconHtml,
           iconSize: [120, 26],
@@ -233,7 +238,7 @@ export default function AirQualityMap({
           popupAnchor: [0, -13]
         });
 
-        const marker = window.L.marker([lat, lon], { icon: customMarker }).addTo(map);
+        const marker = L.marker([lat, lon], { icon: customMarker }).addTo(map);
 
         // Konten Popup Informatif
         const popupHtml = `
@@ -294,7 +299,7 @@ export default function AirQualityMap({
 
   // Efek ganti basemap
   useEffect(() => {
-    if (!mapInstanceRef.current || !window.L) return;
+    if (!mapInstanceRef.current) return;
     const map = mapInstanceRef.current;
 
     if (tileLayerRef.current) {
@@ -302,7 +307,7 @@ export default function AirQualityMap({
     }
 
     const cfg = TILE_CONFIGS[mapStyle];
-    tileLayerRef.current = window.L.tileLayer(cfg.url, {
+    tileLayerRef.current = L.tileLayer(cfg.url, {
       attribution: cfg.attrib,
       maxZoom: cfg.maxZoom || 19
     }).addTo(map);
@@ -324,7 +329,7 @@ export default function AirQualityMap({
 
   // Efek ketika spotlightStation berubah dari luar komponen
   useEffect(() => {
-    if (!spotlightStation || !mapInstanceRef.current || !window.L) return;
+    if (!spotlightStation || !mapInstanceRef.current) return;
     const lat = parseFloat(spotlightStation.latitude);
     const lon = parseFloat(spotlightStation.longitude);
     if (!isNaN(lat) && !isNaN(lon)) {
@@ -496,7 +501,8 @@ export default function AirQualityMap({
       <div className="relative rounded-2xl overflow-hidden border border-slate-700 shadow-inner">
         <div 
           ref={mapContainerRef} 
-          className="w-full h-[470px] z-10"
+          className="w-full h-[480px] z-10"
+          style={{ height: '480px', width: '100%' }}
         ></div>
 
         {/* Legenda Zonasi Area Berwarna di Kiri Bawah */}

@@ -298,6 +298,7 @@ export default function App() {
           weatherAlerts={weatherAlerts}
           weatherList={weatherList}
           volcanoSummary={volcanoSummary}
+          onSelectTab={(tab) => { setActiveSectionTab(tab); playSound('CLICK'); }}
         />
 
         {/* 6. Pemilihan Wilayah & Hero Spotlight Pantauan Lokal (Hanya ditampilkan pada Semua Modul & Tab Cuaca) */}

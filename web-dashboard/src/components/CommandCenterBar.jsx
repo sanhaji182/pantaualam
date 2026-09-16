@@ -20,7 +20,8 @@ export default function CommandCenterBar({
   airQualityData = [], 
   weatherAlerts = [],
   weatherList = [],
-  volcanoSummary = null
+  volcanoSummary = null,
+  onSelectTab = null
 }) {
   // Hitung agregat PM2.5
   const totalSPKU = airQualityData.length;
@@ -111,15 +112,27 @@ export default function CommandCenterBar({
       </div>
 
       {/* 3. KARTU KUALITAS UDARA (PM2.5) */}
-      <div className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-cyan-500 p-4 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
+      <div 
+        onClick={() => {
+          playSound('click');
+          if (onSelectTab) onSelectTab('AIR');
+          setTimeout(() => {
+            const el = document.getElementById('kualitas-udara');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 50);
+        }}
+        className="bg-white rounded-2xl border border-slate-200 border-t-4 border-t-cyan-500 p-4 shadow-xs hover:shadow-md hover:border-cyan-400 transition-all relative overflow-hidden group cursor-pointer"
+        title="Klik untuk membuka Modul & Peta Kualitas Udara PM2.5"
+      >
         <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full -mr-6 -mt-6 group-hover:scale-110 transition-transform"></div>
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
             <Wind className="w-3.5 h-3.5 text-cyan-500" />
             Polusi Udara (PM2.5)
           </span>
-          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
-            {totalSPKU} SPKU
+          <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 flex items-center gap-1">
+            <span>{totalSPKU} SPKU</span>
+            <span className="text-[9px] text-cyan-500">&rarr;</span>
           </span>
         </div>
 
