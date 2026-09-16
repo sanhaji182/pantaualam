@@ -56,6 +56,7 @@ export default function App() {
   const [eruptions, setEruptions] = useState([]);
   const [volcanoSummary, setVolcanoSummary] = useState(null);
   const [focusedVolcano, setFocusedVolcano] = useState(null);
+  const [focusedAirStation, setFocusedAirStation] = useState(null);
   const [selectedCityDetail, setSelectedCityDetail] = useState(null);
   const [shakemapModalUrl, setShakemapModalUrl] = useState(null);
   const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
@@ -101,6 +102,16 @@ export default function App() {
   // Handler fokus kamera peta ke lokasi gunung api tertentu
   const handleFocusVolcano = (volcano) => {
     setFocusedVolcano(volcano);
+    playSound('click');
+    const mapElement = document.getElementById('seismik');
+    if (mapElement) {
+      mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  // Handler fokus kamera peta ke lokasi stasiun kualitas udara tertentu
+  const handleFocusAirStation = (station) => {
+    setFocusedAirStation(station);
     playSound('click');
     const mapElement = document.getElementById('seismik');
     if (mapElement) {
@@ -349,6 +360,8 @@ export default function App() {
               feltQuakes={feltQuakes}
               volcanoes={volcanoes}
               focusedVolcano={focusedVolcano}
+              airQualityData={airQualityList}
+              focusedAirStation={focusedAirStation}
             />
           </section>
         )}
@@ -441,6 +454,7 @@ export default function App() {
             <AirQualitySection
               airQualityData={airQualityList}
               loading={loading}
+              onFocusStation={handleFocusAirStation}
             />
           </section>
         )}

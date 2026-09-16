@@ -103,7 +103,11 @@ export function getCategoryBadge(kategori, pm25) {
   };
 }
 
-export default function AirQualitySection({ airQualityData = [], loading = false }) {
+export default function AirQualitySection({ 
+  airQualityData = [], 
+  loading = false,
+  onFocusStation = null 
+}) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [selectedRegion, setSelectedRegion] = useState('ALL'); // 'ALL', 'JAWA', 'SUMATERA', 'KALIMANTAN', 'TIMUR'
@@ -133,100 +137,107 @@ export default function AirQualitySection({ airQualityData = [], loading = false
       matchesCat = badge.label.toLowerCase() === selectedCategory.toLowerCase();
     }
 
-    let matchesRegion = true;
+    let matchesReg = true;
     if (selectedRegion === 'JAWA') {
-      matchesRegion = sName.includes('dki') || sName.includes('jakarta') || sName.includes('kemayoran') || sName.includes('banten') || sName.includes('jawa') || sName.includes('cibeureum') || sName.includes('guwosari') || sName.includes('surabaya');
+      matchesReg = sName.includes('jakarta') || sName.includes('kemayoran') || sName.includes('ancol') || sName.includes('serang') || sName.includes('bandung') || sName.includes('semarang') || sName.includes('surabaya');
     } else if (selectedRegion === 'SUMATERA') {
-      matchesRegion = sName.includes('sumatera') || sName.includes('medan') || sName.includes('pekanbaru') || sName.includes('jambi') || sName.includes('palembang') || sName.includes('padang') || sName.includes('aceh');
+      matchesReg = sName.includes('medan') || sName.includes('padang') || sName.includes('pekanbaru') || sName.includes('jambi') || sName.includes('palembang') || sName.includes('lampung');
     } else if (selectedRegion === 'KALIMANTAN') {
-      matchesRegion = sName.includes('kalimantan') || sName.includes('pontianak') || sName.includes('palangkaraya') || sName.includes('banjarbaru') || sName.includes('samarinda') || sName.includes('ikn');
+      matchesReg = sName.includes('pontianak') || sName.includes('banjarmasin') || sName.includes('samarinda') || sName.includes('palangkaraya') || sName.includes('kubu raya') || sName.includes('mempawah');
     } else if (selectedRegion === 'TIMUR') {
-      matchesRegion = sName.includes('bali') || sName.includes('denpasar') || sName.includes('ntb') || sName.includes('ntt') || sName.includes('sulawesi') || sName.includes('makassar') || sName.includes('manado') || sName.includes('maluku') || sName.includes('papua');
+      matchesReg = sName.includes('denpasar') || sName.includes('mataram') || sName.includes('kupang') || sName.includes('makassar') || sName.includes('manado') || sName.includes('ambon') || sName.includes('jayapura');
     }
 
-    return matchesSearch && matchesCat && matchesRegion;
+    return matchesSearch && matchesCat && matchesReg;
   });
 
-  const spotlightStation = filteredStations[spotlightIndex] || airQualityData[0];
+  const spotlightStation = filteredStations[spotlightIndex] || filteredStations[0];
   const spotlightBadge = spotlightStation ? getCategoryBadge(spotlightStation.kategori, spotlightStation.pm25) : null;
 
   return (
     <section id="kualitas-udara" className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-6">
       
-      {/* Header & Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      {/* Header Modul */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <Wind className="w-5 h-5" />
             </div>
             <div>
               <h3 className="font-extrabold text-slate-900 text-lg tracking-tight">
-                Indeks Kualitas Udara Partikulat PM2.5 (SPKU BMKG)
+                Indeks Standar Pencemar Udara (ISPU / PM2.5)
               </h3>
               <p className="text-xs text-slate-500">
-                Pemantauan konsentrasi partikel mikroskopis (&le; 2.5 mikrometer) dari 26+ stasiun otomatis seluruh Indonesia.
+                Pemantauan partikulat mikron PM2.5 dari stasiun SPKU otomatis BMKG di kota-kota strategis.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Mode Switcher: Grid vs Ranking */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl text-xs font-bold self-start lg:self-auto">
-          <button
-            onClick={() => { setViewMode('GRID'); playSound('click'); }}
-            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-              viewMode === 'GRID' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Kartu Stasiun</span>
-          </button>
-          <button
-            onClick={() => { setViewMode('RANKING'); playSound('click'); }}
-            className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
-              viewMode === 'RANKING' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Ranking Bar Chart</span>
-          </button>
+        {/* Action Controls: Switcher Tampilan Grid / Bar & Sorting */}
+        <div className="flex items-center gap-2">
+          {/* Switcher Tampilan */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-2xl text-xs font-semibold">
+            <button
+              onClick={() => { setViewMode('GRID'); playSound('click'); }}
+              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                viewMode === 'GRID' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Grid Kartu</span>
+            </button>
+            <button
+              onClick={() => { setViewMode('BAR'); playSound('click'); }}
+              className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                viewMode === 'BAR' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-900'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Ranking Bar</span>
+            </button>
+          </div>
+
+          {/* Selector Sorting */}
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => { setSortBy(e.target.value); playSound('click'); }}
+              className="bg-slate-100 text-slate-700 text-xs font-bold rounded-2xl px-3 py-2 border-0 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="HIGHEST">Polusi Tertinggi</option>
+              <option value="LOWEST">Paling Bersih</option>
+              <option value="NAME">Abjad Stasiun</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* ===================================================================== */}
-      {/* SPOTLIGHT GAUGE CARD & INTERACTIVE HEALTH ADVISORY                   */}
-      {/* ===================================================================== */}
+      {/* Hero Spotlight: Stasiun Terpilih + Radial Meter + Persona Medis */}
       {spotlightStation && spotlightBadge && (
-        <div className="p-5 rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/80 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 text-white grid grid-cols-1 lg:grid-cols-12 gap-6 items-center shadow-lg">
           
-          {/* Sisi Kiri: Speedometer / Radial Arc Visualizer (5 Kolom) */}
-          <div className="lg:col-span-5 flex flex-col sm:flex-row items-center gap-4">
-            <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
-              {/* SVG Radial Gauge */}
-              <svg viewBox="0 0 100 100" className="w-32 h-32 -rotate-90">
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
+          {/* Sisi Kiri: Gauge Radial Meter (5 Kolom) */}
+          <div className="lg:col-span-5 flex flex-col sm:flex-row items-center gap-5">
+            <div className="relative w-28 h-28 flex items-center justify-center shrink-0">
+              {/* Ring Progress SVG */}
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  className="text-slate-700"
+                  strokeWidth="3.5"
+                  stroke="currentColor"
                   fill="none"
-                  stroke="#334155"
-                  strokeWidth="8"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
-                <circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  fill="none"
-                  stroke={
-                    spotlightStation.pm25 > 150 ? '#ef4444' :
-                    spotlightStation.pm25 > 55 ? '#f59e0b' :
-                    spotlightStation.pm25 > 15 ? '#3b82f6' : '#10b981'
-                  }
-                  strokeWidth="8"
-                  strokeDasharray={`${Math.min((spotlightStation.pm25 / 150) * 251, 251)} 251`}
+                <path
+                  className={spotlightBadge.label === 'Baik' ? 'text-emerald-500' : spotlightBadge.label === 'Sedang' ? 'text-blue-500' : spotlightBadge.label === 'Tidak Sehat' ? 'text-amber-500' : 'text-red-500'}
+                  strokeDasharray={`${Math.min(spotlightStation.pm25 / 2.5, 100)}, 100`}
+                  strokeWidth="3.5"
                   strokeLinecap="round"
-                  className="transition-all duration-1000"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
               </svg>
               <div className="absolute flex flex-col items-center justify-center text-center">
@@ -245,6 +256,16 @@ export default function AirQualitySection({ airQualityData = [], loading = false
               <p className="text-xs text-slate-300">
                 Pembaruan: {spotlightStation.waktu_pantau || 'Real-time SPKU'}
               </p>
+              {onFocusStation && (
+                <button
+                  onClick={() => onFocusStation(spotlightStation)}
+                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-xs shadow-sm transition-all cursor-pointer"
+                  title="Pusatkan kamera peta ke stasiun ini"
+                >
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span>Lihat Lokasi di Peta</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -363,9 +384,23 @@ export default function AirQualitySection({ airQualityData = [], loading = false
                     <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${badge.badgeBg}`}>
                       {badge.label}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {station.waktu_pantau ? station.waktu_pantau.split(' ')[0] : 'SPKU'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {station.waktu_pantau ? station.waktu_pantau.split(' ')[0] : 'SPKU'}
+                      </span>
+                      {onFocusStation && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onFocusStation(station);
+                          }}
+                          className="p-1 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-400 transition-all cursor-pointer shadow-xs"
+                          title="Pusatkan peta ke stasiun ini"
+                        >
+                          <MapPin className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <h5 className="font-bold text-slate-900 text-xs line-clamp-1" title={station.stasiun}>
@@ -422,6 +457,18 @@ export default function AirQualitySection({ airQualityData = [], loading = false
                     <span className="text-xs font-black text-slate-900 w-12 text-right shrink-0">
                       {station.pm25}
                     </span>
+                    {onFocusStation && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onFocusStation(station);
+                        }}
+                        className="p-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-400 transition-all cursor-pointer shadow-2xs"
+                        title="Pusatkan peta ke stasiun ini"
+                      >
+                        <MapPin className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               );
