@@ -2,106 +2,28 @@ import React, { useState } from 'react';
 import { 
   Wind, Search, BarChart3, LayoutGrid, ArrowUpDown, 
   ShieldAlert, HeartHandshake, AlertTriangle, Sparkles, Filter, 
-  UserCheck, Baby, HeartPulse, Dumbbell, MapPin 
+  UserCheck, Baby, HeartPulse, Dumbbell, MapPin, Compass
 } from 'lucide-react';
 import { playSound } from '../utils/audio';
+import { getCategoryBadge } from '../utils/airQuality';
+import AirQualityMap from './AirQualityMap';
+
+// Re-export helper penentuan kategori baku mutu PM2.5 BMKG & Permen LHK No. P.14/2020
+export { getCategoryBadge } from '../utils/airQuality';
 
 /**
  * =============================================================================
- * KOMPONEN: AIR QUALITY SECTION (Interactive Radial Gauge & Health Personas)
+ * KOMPONEN: AIR QUALITY SECTION (Interactive Radial Gauge, Map & Health Personas)
  * File: src/components/AirQualitySection.jsx
  * Deskripsi:
- * Menyajikan pemantauan baku mutu PM2.5 BMKG dari 26+ stasiun SPKU dengan:
- * 1. Speedometer / Radial Gauge interaktif untuk stasiun terpilih.
- * 2. Tab persona kesehatan (Umum, Lansia/Anak, Penderita Asma, Olahraga).
- * 3. Filter pulau/region (Jawa, Sumatera, Kalimantan, Timur).
- * 4. Mode Grid Kartu & Visual Ranking Bar Chart.
+ * Menyajikan pemantauan baku mutu PM2.5 BMKG dari 27+ stasiun SPKU dengan:
+ * 1. Peta Geospasial Zonasi Area Polusi Udara (radius sebaran 50-85 km per daerah).
+ * 2. Speedometer / Radial Gauge interaktif untuk stasiun terpilih.
+ * 3. Tab persona kesehatan (Umum, Lansia/Anak, Penderita Asma, Olahraga).
+ * 4. Filter pulau/region (Jawa, Sumatera, Kalimantan, Timur).
+ * 5. Mode Grid Kartu & Visual Ranking Bar Chart.
  * =============================================================================
  */
-
-// Helper Penentuan Kategori Baku Mutu PM2.5 BMKG & Permen LHK No. P.14/2020
-export function getCategoryBadge(kategori, pm25) {
-  const kat = (kategori || '').toLowerCase();
-
-  if (kat.includes('berbahaya') || pm25 > 250.4) {
-    return {
-      label: 'Berbahaya',
-      bg: 'bg-red-50 text-red-900 border-red-200',
-      badgeBg: 'bg-red-600 text-white',
-      barColor: 'bg-red-600',
-      dot: 'bg-red-500',
-      rec: 'Hindari seluruh aktivitas luar ruangan! Wajib gunakan respirator N95 jika terpaksa bepergian.',
-      healthTips: {
-        umum: 'Tutup seluruh ventilasi jendela dan aktifkan air purifier.',
-        anak: 'Sangat berbahaya bagi sistem pernapasan balita dan lansia. Jangan keluar rumah!',
-        asma: 'Gunakan nebulizer/inhaler sesuai anjuran dokter dan hindari paparan udara.',
-        olahraga: 'DILARANG berolahraga di luar ruangan! Ganti dengan peregangan indoor.'
-      }
-    };
-  }
-  if (kat.includes('sangat tidak sehat') || pm25 > 150.4) {
-    return {
-      label: 'Sangat Tidak Sehat',
-      bg: 'bg-rose-50 text-rose-900 border-rose-200',
-      badgeBg: 'bg-rose-600 text-white',
-      barColor: 'bg-rose-500',
-      dot: 'bg-rose-500',
-      rec: 'Kelompok sensitif harus tetap di dalam ruangan. Nyalakan pembersih udara.',
-      healthTips: {
-        umum: 'Gunakan masker anti-polusi N95 atau KF94 saat keluar ruangan.',
-        anak: 'Batasi jam bermain anak di luar rumah, pantau gejala batuk/sesak.',
-        asma: 'Siapkan obat pelega pernapasan, hindari jalan raya bertrafik padat.',
-        olahraga: 'Tunda lari atau bersepeda luar ruangan sampai indeks membaik.'
-      }
-    };
-  }
-  if (kat.includes('tidak sehat') || pm25 > 55.4) {
-    return {
-      label: 'Tidak Sehat',
-      bg: 'bg-amber-50 text-amber-900 border-amber-200',
-      badgeBg: 'bg-amber-500 text-slate-950 font-black',
-      barColor: 'bg-amber-500',
-      dot: 'bg-amber-500',
-      rec: 'Gunakan masker medis saat bepergian. Kelompok rentan kurangi aktivitas outdoor.',
-      healthTips: {
-        umum: 'Kenakan masker medis ganda atau KN95 saat beraktivitas di jalan raya.',
-        anak: 'Kurangi kegiatan fisik berat anak di halaman sekolah/taman.',
-        asma: 'Minum air putih hangat lebih sering dan hindari asap kendaraan.',
-        olahraga: 'Kurangi durasi dan intensitas latihan kardio di luar ruangan.'
-      }
-    };
-  }
-  if (kat.includes('sedang') || pm25 > 15.4) {
-    return {
-      label: 'Sedang',
-      bg: 'bg-blue-50 text-blue-900 border-blue-200',
-      badgeBg: 'bg-blue-600 text-white',
-      barColor: 'bg-blue-500',
-      dot: 'bg-blue-500',
-      rec: 'Kualitas udara dapat diterima untuk masyarakat umum.',
-      healthTips: {
-        umum: 'Udara cukup baik untuk aktivitas harian normal.',
-        anak: 'Anak-anak dan lansia dapat beraktivitas seperti biasa.',
-        asma: 'Kelompok hipersensitif disarankan tetap waspada jika ada gejala batuk.',
-        olahraga: 'Aman untuk jogging dan olahraga pagi di area taman terbuka.'
-      }
-    };
-  }
-  return {
-    label: 'Baik',
-    bg: 'bg-emerald-50 text-emerald-900 border-emerald-200',
-    badgeBg: 'bg-emerald-600 text-white',
-    barColor: 'bg-emerald-500',
-    dot: 'bg-emerald-500',
-    rec: 'Kualitas udara sangat bersih dan segar! Sangat ideal untuk berolahraga.',
-    healthTips: {
-      umum: 'Buka ventilasi rumah untuk sirkulasi udara alami yang segar.',
-      anak: 'Sangat aman dan menyehatkan bagi anak-anak bermain di luar.',
-      asma: 'Kondisi paru-paru optimal, risiko iritasi sangat minimal.',
-      olahraga: 'Waktu terbaik untuk maraton, bersepeda, dan aktivitas kardio outdoor!'
-    }
-  };
-}
 
 export default function AirQualitySection({ 
   airQualityData = [], 
@@ -114,7 +36,7 @@ export default function AirQualitySection({
   const [viewMode, setViewMode] = useState('GRID');
   const [sortBy, setSortBy] = useState('HIGHEST');
   const [activePersona, setActivePersona] = useState('umum'); // 'umum', 'anak', 'asma', 'olahraga'
-  const [spotlightIndex, setSpotlightIndex] = useState(0);
+  const [selectedStationName, setSelectedStationName] = useState(null);
 
   // Sorting
   let sortedData = [...airQualityData];
@@ -151,7 +73,9 @@ export default function AirQualitySection({
     return matchesSearch && matchesCat && matchesReg;
   });
 
-  const spotlightStation = filteredStations[spotlightIndex] || filteredStations[0];
+  const spotlightStation = (selectedStationName 
+    ? airQualityData.find((s) => s.stasiun === selectedStationName) 
+    : null) || filteredStations[0] || airQualityData[0] || null;
   const spotlightBadge = spotlightStation ? getCategoryBadge(spotlightStation.kategori, spotlightStation.pm25) : null;
 
   return (
@@ -214,6 +138,15 @@ export default function AirQualitySection({
         </div>
       </div>
 
+      {/* Peta Geospasial Interaktif Pemetaan Zonasi Kualitas Udara Per Daerah (Radius 50-85 km) */}
+      <AirQualityMap
+        airQualityData={airQualityData}
+        spotlightStation={spotlightStation}
+        onSelectStation={(station) => {
+          setSelectedStationName(station.stasiun);
+        }}
+      />
+
       {/* Hero Spotlight: Stasiun Terpilih + Radial Meter + Persona Medis */}
       {spotlightStation && spotlightBadge && (
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-6 text-white grid grid-cols-1 lg:grid-cols-12 gap-6 items-center shadow-lg">
@@ -256,16 +189,22 @@ export default function AirQualitySection({
               <p className="text-xs text-slate-300">
                 Pembaruan: {spotlightStation.waktu_pantau || 'Real-time SPKU'}
               </p>
-              {onFocusStation && (
-                <button
-                  onClick={() => onFocusStation(spotlightStation)}
-                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-xs shadow-sm transition-all cursor-pointer"
-                  title="Pusatkan kamera peta ke stasiun ini"
-                >
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span>Lihat Lokasi di Peta</span>
-                </button>
-              )}
+              <button
+                onClick={() => {
+                  setSelectedStationName(spotlightStation.stasiun);
+                  const el = document.getElementById('air-quality-map');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  } else if (onFocusStation) {
+                    onFocusStation(spotlightStation);
+                  }
+                }}
+                className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold text-xs shadow-sm transition-all cursor-pointer"
+                title="Pusatkan kamera peta ke stasiun ini"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                <span>Lihat Lokasi di Peta</span>
+              </button>
             </div>
           </div>
 
@@ -372,7 +311,7 @@ export default function AirQualitySection({
             return (
               <div
                 key={idx}
-                onClick={() => { setSpotlightIndex(idx); playSound('click'); }}
+                onClick={() => { setSelectedStationName(station.stasiun); playSound('click'); }}
                 className={`p-4 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between ${
                   isSpotlight
                     ? 'bg-blue-50/80 border-blue-500 shadow-md ring-2 ring-blue-400/20'
@@ -388,18 +327,23 @@ export default function AirQualitySection({
                       <span className="text-[10px] text-slate-400 font-mono">
                         {station.waktu_pantau ? station.waktu_pantau.split(' ')[0] : 'SPKU'}
                       </span>
-                      {onFocusStation && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedStationName(station.stasiun);
+                          playSound('click');
+                          const el = document.getElementById('air-quality-map');
+                          if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          } else if (onFocusStation) {
                             onFocusStation(station);
-                          }}
-                          className="p-1 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-400 transition-all cursor-pointer shadow-xs"
-                          title="Pusatkan peta ke stasiun ini"
-                        >
-                          <MapPin className="w-3 h-3" />
-                        </button>
-                      )}
+                          }
+                        }}
+                        className="p-1 rounded-lg bg-white border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-400 transition-all cursor-pointer shadow-xs"
+                        title="Pusatkan peta ke stasiun ini"
+                      >
+                        <MapPin className="w-3 h-3" />
+                      </button>
                     </div>
                   </div>
 
@@ -437,7 +381,7 @@ export default function AirQualitySection({
               return (
                 <div
                   key={idx}
-                  onClick={() => { setSpotlightIndex(idx); playSound('click'); }}
+                  onClick={() => { setSelectedStationName(station.stasiun); playSound('click'); }}
                   className="p-3 bg-white rounded-2xl border border-slate-200/70 hover:border-blue-400 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
                 >
                   <div className="w-full sm:w-1/3">
@@ -457,18 +401,23 @@ export default function AirQualitySection({
                     <span className="text-xs font-black text-slate-900 w-12 text-right shrink-0">
                       {station.pm25}
                     </span>
-                    {onFocusStation && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedStationName(station.stasiun);
+                        playSound('click');
+                        const el = document.getElementById('air-quality-map');
+                        if (el) {
+                          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else if (onFocusStation) {
                           onFocusStation(station);
-                        }}
-                        className="p-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-400 transition-all cursor-pointer shadow-2xs"
-                        title="Pusatkan peta ke stasiun ini"
-                      >
-                        <MapPin className="w-3.5 h-3.5" />
-                      </button>
-                    )}
+                        }
+                      }}
+                      className="p-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 text-slate-400 transition-all cursor-pointer shadow-2xs"
+                      title="Pusatkan peta ke stasiun ini"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               );

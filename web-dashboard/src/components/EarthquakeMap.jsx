@@ -315,6 +315,33 @@ export default function EarthquakeMap({
 
           const isHighPollution = pm25 > 55.4;
 
+          // A. Pemetaan Area Sebaran Polusi Wilayah (Radius 50-80 km dengan Warna Kategori Daerah)
+          const areaRadius = isHighPollution ? 65000 : 45000;
+
+          // Lingkaran Dispersi Luar (Transparan)
+          window.L.circle([lat, lon], {
+            radius: areaRadius * 1.5,
+            fillColor: color,
+            fillOpacity: isHighPollution ? 0.15 : 0.08,
+            color: border,
+            weight: 1,
+            dashArray: '4, 4'
+          }).addTo(map);
+
+          // Zonasi Utama Area Polusi Daerah
+          const areaZone = window.L.circle([lat, lon], {
+            radius: areaRadius,
+            fillColor: color,
+            fillOpacity: isHighPollution ? 0.38 : 0.25,
+            color: border,
+            weight: 2,
+          }).addTo(map);
+
+          areaZone.bindTooltip(
+            `<div style="font-size: 11px;"><b>Zona Wilayah: ${station.stasiun}</b><br><span style="color: ${color}; font-weight: bold;">PM2.5: ${pm25} µg/m³ (${badge.label})</span></div>`,
+            { sticky: true, opacity: 0.95 }
+          );
+
           // Custom DivIcon marker dengan nilai PM2.5 dan icon angin
           const iconHtml = `
             <div style="position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer;">
@@ -378,6 +405,7 @@ export default function EarthquakeMap({
             </div>
           `;
           airMarker.bindPopup(popupHtml);
+          areaZone.bindPopup(popupHtml);
 
           const key = `AIR_${station.id || station.stasiun}`;
           markersRef.current[key] = airMarker;
@@ -385,7 +413,23 @@ export default function EarthquakeMap({
       });
     }
 
+    setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }, 200);
+
   }, [latestQuake, recentQuakes, feltQuakes, activeLayer, showVolcanoLayer, volcanoes, showAirQualityLayer, airQualityData]);
+
+  // Cleanup Leaflet instance saat unmount
+  useEffect(() => {
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
 
   // Efek flyTo kamera saat stasiun kualitas udara dipilih dari section atau feed
   useEffect(() => {
